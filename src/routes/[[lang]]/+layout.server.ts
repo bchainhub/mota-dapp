@@ -2,14 +2,19 @@ import type { LayoutServerLoad } from './$types';
 import { redirect, error } from '@sveltejs/kit';
 import { getAvailableLocales } from '$lib/helpers/i18n';
 
-const languageConfig = __SITE_CONFIG__?.language;
+import { getSiteConfig } from '$lib/helpers/siteConfig';
+const languageConfig = getSiteConfig()?.language;
 const available = getAvailableLocales();
 const defaultLocale = languageConfig?.defaultLocale || 'en';
 
 export const load: LayoutServerLoad = async ({ url, params, request, locals }) => {
 	if (!languageConfig?.enabled) {
 		locals.locale = defaultLocale;
-		return { locale: defaultLocale };
+		const session = locals.session;
+		return {
+			locale: defaultLocale,
+			...(session !== undefined && { session })
+		};
 	}
 
 	// 1) derive candidate locale from URL params
@@ -29,9 +34,13 @@ export const load: LayoutServerLoad = async ({ url, params, request, locals }) =
 
 	locals.locale = locale;
 
-	// return the locale and a flag indicating if it came from URL
+	// Session is set in hooks (sessionHandle) only when passkey is enabled. Include in layout data only when we have it.
+	const session = locals.session;
+	const loggedIn = session != null && session.user != null;
+
 	return {
 		locale,
-		fromUrl: !!params.lang
+		fromUrl: !!params.lang,
+		...(session !== undefined && { session })
 	};
 };

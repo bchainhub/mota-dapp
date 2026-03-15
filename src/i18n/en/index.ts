@@ -2,11 +2,12 @@ import type { BaseTranslation } from '../i18n-types'
 
 const en: BaseTranslation = {
 	site: {
-		description: 'Mota ₡ore',
-		keywords: 'mota, ₡ore, blockchain, ican, payto, oric, corepass, txms'
+		description: 'MOTA',
+		keywords: 'mota, sveltekit, dapp, blockchain, moneyx, paypass, ican, payto, oric, corepass, txms'
 	},
 
 	common: {
+		account: 'Account',
 		loading: 'Loading…',
 		error: 'Error',
 		success: 'Success',
@@ -14,6 +15,7 @@ const en: BaseTranslation = {
 		confirm: 'Confirm',
 		close: 'Close',
 		back: 'Back',
+		menu: 'Menu',
 		next: 'Next',
 		submit: 'Submit',
 		save: 'Save',
@@ -42,7 +44,6 @@ const en: BaseTranslation = {
 		}
 	},
 
-
 	helpers: {
 		keys: {
 			copiedToClipboard: 'Key copied to clipboard',
@@ -54,11 +55,11 @@ const en: BaseTranslation = {
 			requiredError: 'Core ID is required'
 		},
 		wallet: {
-			corePass: 'CorePass',
-			corePassNotConfigured: 'CorePass extension is not configured.',
-			corePassNotInstalled: 'CorePass extension is not installed or enabled.',
-			corePassCannotConnect: 'Cannot connect to CorePass extension.',
-			corePassDisconnected: 'CorePass disconnected.'
+			walletNotConfigured: 'Wallet is not configured.',
+			walletNotInstalled: 'Wallet is not installed or enabled.',
+			walletCannotConnect: 'Cannot connect to wallet.',
+			walletConnected: 'Wallet connected.',
+			walletDisconnected: 'Wallet disconnected.'
 		}
 	},
 
@@ -66,6 +67,10 @@ const en: BaseTranslation = {
 		home: 'Home',
 		support: 'Support',
 		register: 'Register',
+		login: 'Login',
+		logout: 'Logout',
+		connect: 'Connect',
+		disconnect: 'Disconnect',
 		profile: 'Profile',
 		settings: 'Settings'
 	},
@@ -76,50 +81,16 @@ const en: BaseTranslation = {
 		applications: 'Applications',
 		developers: 'Developers',
 		contact: 'Contact',
+		allianceMember: 'PayTo Alliance Member',
 		termsOfService: 'Terms of Service',
 		privacyPolicy: 'Privacy Policy',
 		keyRegistry: 'Key Registry',
-		copyright: '© Copyright 2025-{year} Mota'
+		copyright: '© Copyright 2025-{year} MOTA'
 	},
 
-	auth: {
-		login: 'Login',
-		logout: 'Logout',
-		register: 'Register',
-		profile: 'Profile',
-		settings: 'Settings',
-		connect: 'Connect'
-	},
+	modules: {},
 
-	support: {
-		title: 'Support',
-		supportType: 'Support Type',
-		askAI: 'Ask AI',
-		createTicket: 'Create Ticket',
-		subject: 'Subject',
-		question: 'Question',
-		followUpQuestion: 'Follow-up Question',
-		askYourQuestion: 'Ask your question…',
-		send: 'Send',
-		processing: 'Processing…',
-		sendTicketByEmail: 'Send Ticket by Email',
-		aiResponse: 'AI Response',
-		errors: {
-			pleaseEnterYourQuestion: 'Please enter your question',
-			aiServiceNotAvailable: 'AI service is not available',
-			supportEmailNotConfigured: 'Support email is not configured',
-			anErrorOccurredWhileAskingAI: 'An error occurred while asking AI',
-			failedToGetAIResponse: 'Failed to get AI response',
-			supportIsNotAvailable: 'Support is not available'
-		},
-		subjects: {
-			general: 'General',
-			payments: 'Payments',
-			refunds: 'Refunds',
-			other: 'Other'
-		}
-	}
-
+	content: {}
 };
 
 export default en;

@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	// @ts-ignore - LL might not be available if i18n library not installed
+	import { LL } from '$lang/i18n-svelte';
+	import { t } from '$lib/helpers/i18n';
 
 	const {
 		title = null,
+		formatKind = 'user',
+		providerIcon = null,
 		items = [],
 		open: initialOpen = false,
-		position = 'left',
 		isSmall = false,
 		iconExternal = true,
 		className = '',
@@ -14,6 +18,10 @@
 		onChange
 	} = $props<{
 		title: string | null;
+		/** Kind of identity for shortFormat: Core Blockchain (CorePass) = core, other wallet, or user. */
+		formatKind?: ShortFormatKind;
+		/** Icon to show after title: 'web3' (Wallet) or 'passkey' (Key). */
+		providerIcon?: 'web3' | 'passkey' | null;
 		items: MenuItem[];
 		open?: boolean;
 		position?: 'left' | 'right';
@@ -25,7 +33,7 @@
 		onChange?: (event: CustomEvent<{ label: string; action?: () => void }>) => void;
 	}>();
 
-	let isOpen = $state(initialOpen);
+	let isOpen = $state(false);
 
 	$effect(() => {
 		isOpen = initialOpen;
@@ -39,16 +47,16 @@
 	});
 
 	import { onMount, onDestroy } from 'svelte';
-	import { Icon } from '$lib/components';
-	import { ChevronDown, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-svelte';
-	import ICAN from '@blockchainhub/ican';
+	import { Icon } from '$components';
+	import { asDynamicIcon } from '$lib/helpers/icon';
+	import { ChevronDown, ChevronLeft, ChevronRight, ArrowUpRight, Wallet, Key } from 'lucide-svelte';
 	import { blo } from '@blockchainhub/blo';
+	import { shortFormat, type ShortFormatKind } from '$lib/helpers/shortFormat';
 
 	let dropdownRef: HTMLDivElement | null = null;
 
 	const handleItemClick = (item: MenuItem, event: Event) => {
 		if (item.action) {
-			item.action();
 			isOpen = false;
 			onChange?.(new CustomEvent('change', { detail: item }));
 		} else if (item.href) {
@@ -81,7 +89,7 @@
 </script>
 
 <!-- Desktop ActionsDropdown -->
-<div class="relative lg:block hidden" bind:this={dropdownRef}>
+<div class="relative lg:block hidden {className}" bind:this={dropdownRef}>
 	<button
 		onclick={handleToggle}
 		class="group {orientation === 'vertical' ? 'px-4 py-2 w-full justify-start' : 'px-1 py-2'} font-medium text-base flex items-center cursor-pointer transition-colors duration-200 {theme === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : theme === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}"
@@ -89,10 +97,21 @@
 		aria-haspopup="true"
 	>
 		{#if title}
-			<img alt={title} src={blo(title)} class="w-6 h-6 rounded-full mr-2" />
-			<span class="whitespace-nowrap">{ICAN.shortFormat(title)}</span>
+			<span class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center bg-white/60 dark:bg-slate-700/60 mr-2 overflow-hidden">
+				<img alt={title} src={blo(title)} class="w-8 h-8 rounded-full object-cover" />
+			</span>
+			<span class="whitespace-nowrap">{shortFormat(title, formatKind)}</span>
+			{#if providerIcon === 'web3'}
+				<span class="ml-1.5 flex-shrink-0 flex items-center" aria-hidden="true">
+					<Wallet class="h-4 w-4 opacity-80" />
+				</span>
+			{:else if providerIcon === 'passkey'}
+				<span class="ml-1.5 flex-shrink-0 flex items-center" aria-hidden="true">
+					<Key class="h-4 w-4 opacity-80" />
+				</span>
+			{/if}
 		{:else}
-			<span>Menu</span>
+			<span>{t('common.menu', $LL)}</span>
 		{/if}
 		{#if orientation === 'vertical'}
 			<ChevronRight class="w-3 h-3 ml-1 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}" />
@@ -110,10 +129,15 @@
 						<!-- External Link -->
 						<button
 							onclick={(e) => { e.stopPropagation(); handleItemClick(item, e); }}
-							class="w-full flex items-center justify-start px-4 py-2 text-left hover:bg-slate-700 transition-colors text-slate-300 {item.active ? 'bg-slate-700' : ''} {item.className}"
+							class="w-full flex items-center justify-start px-4 py-2 text-left hover:bg-slate-700 transition-colors text-slate-300 {item.active ? 'bg-slate-700' : ''} {item.className ?? ''}"
 						>
 							{#if item.icon}
-								<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{#if typeof item.icon === 'string'}
+									<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{:else}
+									{@const IconC = asDynamicIcon(item.icon)}
+									<IconC class="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{/if}
 							{/if}
 							{#if item.label}
 								<span class="whitespace-nowrap">{item.label}</span>
@@ -126,10 +150,15 @@
 						<!-- Action Button -->
 						<button
 							onclick={(e) => { e.stopPropagation(); handleItemClick(item, e); }}
-							class="w-full flex items-center justify-start px-4 py-2 text-left hover:bg-slate-700 transition-colors text-slate-300 {item.active ? 'bg-slate-700' : ''} {item.className}"
+							class="w-full flex items-center justify-start px-4 py-2 text-left hover:bg-slate-700 transition-colors text-slate-300 {item.active ? 'bg-slate-700' : ''} {item.className ?? ''}"
 						>
 							{#if item.icon}
-								<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{#if typeof item.icon === 'string'}
+									<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{:else}
+									{@const IconC = asDynamicIcon(item.icon)}
+									<IconC class="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{/if}
 							{/if}
 							{#if item.label}
 								<span class="whitespace-nowrap">{item.label}</span>
@@ -143,17 +172,28 @@
 </div>
 
 <!-- Mobile ActionsDropdown (SubmenuCompact style) -->
-<div class="lg:hidden block">
+<div class="lg:hidden block {className}">
 	<button
 		onclick={handleToggle}
 		class="flex items-center justify-between w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8"
 	>
 		<div class="flex items-center justify-center flex-1">
 			{#if title}
-				<img alt={title} src={blo(title)} class="w-6 h-6 rounded-full mr-2" />
-				<span>{ICAN.shortFormat(title)}</span>
+				<span class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center bg-white/60 dark:bg-slate-700/60 mr-2 overflow-hidden">
+					<img alt={title} src={blo(title)} class="w-8 h-8 rounded-full object-cover" />
+				</span>
+				<span>{shortFormat(title, formatKind)}</span>
+				{#if providerIcon === 'web3'}
+					<span class="ml-1.5 flex-shrink-0 flex items-center" aria-hidden="true">
+						<Wallet class="h-4 w-4 opacity-80" />
+					</span>
+				{:else if providerIcon === 'passkey'}
+					<span class="ml-1.5 flex-shrink-0 flex items-center" aria-hidden="true">
+						<Key class="h-4 w-4 opacity-80" />
+					</span>
+				{/if}
 			{:else}
-				<span>Menu</span>
+				<span>{t('common.menu', $LL)}</span>
 			{/if}
 		</div>
 		<ChevronRight className="h-5 w-5" />
@@ -171,7 +211,7 @@
 							class="flex items-center justify-between w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8"
 						>
 							<ChevronLeft className="h-5 w-5" />
-							<span>Back</span>
+							<span>{t('common.back', $LL)}</span>
 							<div class="w-5"></div> <!-- Spacer to balance the layout -->
 						</button>
 					</li>
@@ -184,11 +224,16 @@
 									<!-- External Link -->
 									<button
 										onclick={(e) => { e.stopPropagation(); handleItemClick(item, e); }}
-										class="flex items-center justify-center w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8 {item.active ? 'text-indigo-400' : '' } {item.className}"
+										class="flex items-center justify-center w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8 {item.active ? 'text-indigo-400' : ''} {isSmall ? '' : (item.className ?? '')}"
 									>
 										<div class="flex items-center">
 											{#if item.icon}
-												<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{#if typeof item.icon === 'string'}
+													<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{:else}
+													{@const IconC = asDynamicIcon(item.icon)}
+													<IconC class="h-5 w-5 mr-1.5" />
+												{/if}
 											{/if}
 											<span>{item.label}</span>
 											{#if typeof iconExternal === 'undefined' || iconExternal === true}
@@ -200,11 +245,16 @@
 									<!-- Action Button -->
 									<button
 										onclick={(e) => { e.stopPropagation(); handleItemClick(item, e); }}
-										class="flex items-center justify-center w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8 {item.active ? 'text-indigo-400' : '' } {item.className}"
+										class="flex items-center justify-center w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8 {item.active ? 'text-indigo-400' : ''} {isSmall ? '' : (item.className ?? '')}"
 									>
 										<div class="flex items-center">
 											{#if item.icon}
-												<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{#if typeof item.icon === 'string'}
+													<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{:else}
+													{@const IconC = asDynamicIcon(item.icon)}
+													<IconC class="h-5 w-5 mr-1.5" />
+												{/if}
 											{/if}
 											<span>{item.label}</span>
 										</div>

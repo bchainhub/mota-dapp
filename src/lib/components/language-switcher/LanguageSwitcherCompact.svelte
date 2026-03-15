@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
-	import { Icon } from '$lib/components';
+	import { Icon } from '$components';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import { getLocale, applyLocale } from '$lib/helpers/i18n';
+	import { locale as localeStore } from '$lang/i18n-svelte';
 
 	let {
 		title = '',
@@ -37,10 +38,11 @@
 		}
 	}
 
-	// Update items with correct active state based on localStorage
+	// Use i18n store so active state persists across navigations
+	const effectiveLocale = $derived($localeStore ?? currentLocale);
 	const updatedItems = $derived(items.map(item => ({
 		...item,
-		active: currentLocale ? item.id === currentLocale : item.active
+		active: effectiveLocale ? item.id === effectiveLocale : item.active
 	})));
 
 	// Listen for storage changes
@@ -70,11 +72,8 @@
 	};
 
 	const selectItem = async (item: any) => {
-		// Apply locale using i18n helper
+		// Apply locale using i18n helper (locale store updates; UI follows)
 		await applyLocale(item.id);
-
-		// Update current locale immediately
-		currentLocale = item.id;
 
 		onselect?.(item);
 		slideDirection = 'exit';

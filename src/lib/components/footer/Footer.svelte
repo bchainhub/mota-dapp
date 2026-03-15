@@ -2,17 +2,90 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { ArrowUpRight, ChevronRight } from 'lucide-svelte';
-	import { Icon } from '../icon';
+	import { Icon, Tooltip } from '$components';
+	import { Key } from 'lucide-svelte';
+	import { asDynamicIcon } from '$lib/helpers/icon';
 	// @ts-ignore - LL might not be available if i18n library not installed
-	import { LL } from '../../../i18n/i18n-svelte';
+	import { LL } from '$lang/i18n-svelte';
 	import { t } from '$lib/helpers/i18n';
+	import { walletAddress } from '$modules/auth/web3';
+	import {
+		getAuthNavActions,
+		resolveAuthNavAction,
+		isAuthEnabled,
+		isLoggedIn as isLoggedInHelper,
+		getAuthProviders
+	} from '$modules/auth/nav-actions';
+	import { shouldShowItem, type ItemWithShow } from '$lib/helpers/nav';
+	import { loadModule } from '$lib/helpers/modules';
+	import { getSiteConfig } from '$lib/helpers/siteConfig';
 
-	const { style, logo, copyright, liner, links, iconExternal } =
-		__SITE_CONFIG__?.themeConfig?.footer || {};
+	const _cfg = getSiteConfig();
+	const footerCfg = _cfg?.themeConfig?.footer;
+	const { style, logo, copyright, liner, links, iconExternal } = footerCfg ?? {};
 	const footerClass = style && `footer-${style}`;
 
-	let connectionStatus: boolean = false;
-	let pathSegments: { name: string; url: string; current: boolean }[] = [];
+	const { session: sessionProp = undefined }: { session?: App.Locals['session'] } = $props();
+
+	/** Session from layout (passkey optional). */
+	const session = $derived(sessionProp);
+	const authEnabled = $derived(isAuthEnabled());
+	const isLoggedIn = $derived(isLoggedInHelper(session, $walletAddress));
+	const connected = $derived(session?.walletConnected ?? !!$walletAddress);
+	const authIn = $derived(Boolean(session?.user));
+	const showContext = $derived({ loggedIn: isLoggedIn, connected, authIn });
+	const authProviders = $derived(getAuthProviders(session, $walletAddress));
+
+	/** Filter by show only when auth enabled; otherwise show all. */
+	const visibleLinks = $derived(
+		(links ?? []).map((section) => ({
+			...section,
+			items: authEnabled
+				? (section.items ?? []).filter((item) => shouldShowItem(item as unknown as ItemWithShow, showContext))
+				: (section.items ?? [])
+		})).filter((section) => section.items.length > 0)
+	);
+	const authNavActions = $derived(getAuthNavActions($LL));
+
+	let bankingModule = $state<unknown>(null);
+	onMount(() => {
+		loadModule('banking').then((m) => (bankingModule = m));
+	});
+
+	type LinerItem = {
+		label?: string;
+		to?: string;
+		href?: string;
+		target?: string;
+		rel?: string;
+		className?: string;
+		icon?: string | (new (...args: unknown[]) => unknown);
+		action?: () => void;
+	};
+	const visibleLiner = $derived.by(() => {
+		const linerItems = liner ?? [];
+		const filtered = authEnabled
+			? linerItems.filter((item) => shouldShowItem(item as unknown as ItemWithShow, showContext))
+			: linerItems;
+		const oricItem =
+			bankingModule && typeof bankingModule === 'object' && 'getBankingOricFooterLinerItem' in bankingModule
+				? (bankingModule as { getBankingOricFooterLinerItem: (b: unknown) => unknown }).getBankingOricFooterLinerItem(
+						_cfg?.modules
+					)
+				: null;
+		const withOric = oricItem ? [...filtered, oricItem] : filtered;
+		return (withOric as Record<string, unknown>[]).map((item) => {
+			const action =
+				'action' in item && item.action !== undefined
+					? typeof item.action === 'string'
+						? resolveAuthNavAction(item.action, authNavActions)
+						: (item.action as () => void)
+					: undefined;
+			return { ...item, action } as LinerItem;
+		});
+	});
+
+	let connectionStatus = $state(false);
 
 	// Function to convert kebab-case to capitalized words with spaces
 	function kebabToCapitalized(str: string): string {
@@ -23,22 +96,24 @@
 	}
 
 	// Parse URL and create breadcrumb segments
-	$: if ($page && $page.url) {
+	const pathSegments = $derived.by(() => {
+		if (!$page?.url) return [];
 		const path = $page.url.pathname;
 		const segments = path.split('/').filter((segment) => segment);
-
-		pathSegments = [{ name: t('footer.home', $LL), url: '/', current: segments.length === 0 }];
-
+		const result: { name: string; url: string; current: boolean }[] = [
+			{ name: t('footer.home', $LL), url: '/', current: segments.length === 0 }
+		];
 		let currentPath = '';
 		segments.forEach((segment, index) => {
 			currentPath += `/${segment}`;
-			pathSegments.push({
+			result.push({
 				name: kebabToCapitalized(segment),
 				url: currentPath,
 				current: index === segments.length - 1
 			});
 		});
-	}
+		return result;
+	});
 
 	onMount(() => {
 		const updateConnectionStatus = () => {
@@ -82,9 +157,9 @@
 		<hr class="my-2 !border-gray-500/50" />
 
 		<!-- Footer Links Section -->
-		{#if links && links.length > 0}
+		{#if visibleLinks && visibleLinks.length > 0}
 			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4 mb-8 text-center sm:text-left">
-				{#each links as section}
+				{#each visibleLinks as section}
 					<div class="text-center sm:text-left">
 						<h4 class="text-lg font-semibold mb-2">
 							{t(section.title, $LL)}
@@ -95,7 +170,12 @@
 									{#if item.to}
 										<a href={item.to} class="hover:text-primary-600 transition duration-150 inline-block sm:inline">
 											{#if item.icon}
-												<Icon name={item.icon} className="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+												{#if typeof item.icon === 'string'}
+													<Icon name={item.icon} className="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+												{:else}
+													{@const IconC = asDynamicIcon(item.icon)}
+													<IconC class="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+												{/if}
 											{/if}
 											{#if item.label}
 												{t(item.label, $LL)}
@@ -109,7 +189,12 @@
 											class="hover:text-primary-600 transition duration-150 inline-flex items-center justify-center sm:justify-start"
 										>
 											{#if item.icon}
-												<Icon name={item.icon} className="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+												{#if typeof item.icon === 'string'}
+													<Icon name={item.icon} className="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+												{:else}
+													{@const IconC = asDynamicIcon(item.icon)}
+													<IconC class="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+												{/if}
 											{/if}
 											{#if item.label}
 												{t(item.label, $LL)}
@@ -130,26 +215,31 @@
 		<div class="flex flex-col md:flex-row gap-4 items-center mb-2 mt-4">
 			{#if logo}
 				<a href="/" class="flex items-center mb-4 md:mb-0">
-					<img src={logo.src} alt={logo.alt || __SITE_CONFIG__.title} class="h-10" />
+					<img src={logo.src} alt={logo.alt} class="h-10" />
 				</a>
-			{:else if __SITE_CONFIG__?.title}
+			{:else if _cfg?.title}
 				<a href="/" class="flex items-center mb-4 md:mb-0">
-					<h1 class="text-xl font-bold">{__SITE_CONFIG__.title.endsWith(' ₡ore') ? __SITE_CONFIG__.title.slice(0, -5) : __SITE_CONFIG__.title}</h1>
+					<h1 class="text-xl font-bold">{_cfg.title}</h1>
 				</a>
 			{/if}
 			<div class="text-center text-sm text-footer-link">
 				{t(copyright || 'footer.copyright', $LL, { year: new Date().getFullYear() })}
 			</div>
-			{#if liner}
+			{#if visibleLiner && visibleLiner.length > 0}
 				<div
 					class="flex flex-wrap justify-center text-sm md:justify-start gap-4 md:ml-4"
 				>
-					{#each liner as { label, to, href, target, rel, className, icon }}
+					{#each visibleLiner as { label, to, href, target, rel, className, icon, action }}
 						<div class="flex items-center">
 							{#if to}
 								<a href={to} class="hover:text-footer-link-hover {className}">
 									{#if icon}
-										<Icon name={icon} className="h-4 w-4 {label ? 'mr-1' : ''}" />
+										{#if typeof icon === 'string'}
+											<Icon name={icon} className="h-4 w-4 {label ? 'mr-1' : ''}" />
+										{:else}
+											{@const IconC = asDynamicIcon(icon)}
+											<IconC class="h-4 w-4 {label ? 'mr-1' : ''}" />
+										{/if}
 									{/if}
 									{#if label}
 										{t(label, $LL)}
@@ -163,7 +253,12 @@
 									class="hover:text-footer-link-hover flex items-center {className}"
 								>
 									{#if icon}
-										<Icon name={icon} className="h-4 w-4 {label ? 'mr-1' : ''}" />
+										{#if typeof icon === 'string'}
+											<Icon name={icon} className="h-4 w-4 {label ? 'mr-1' : ''}" />
+										{:else}
+											{@const IconC = asDynamicIcon(icon)}
+											<IconC class="h-4 w-4 {label ? 'mr-1' : ''}" />
+										{/if}
 									{/if}
 									{#if label}
 										{t(label, $LL)}
@@ -172,12 +267,55 @@
 										<ArrowUpRight class="h-4 w-4" />
 									{/if}
 								</a>
+							{:else if action}
+								<button
+									type="button"
+									onclick={action}
+									class="hover:text-footer-link-hover flex items-center cursor-pointer border-0 bg-transparent p-0 text-inherit {className}"
+								>
+									{#if icon}
+										{#if typeof icon === 'string'}
+											<Icon name={icon} className="h-4 w-4 {label ? 'mr-1' : ''}" />
+										{:else}
+											{@const IconC = asDynamicIcon(icon)}
+											<IconC class="h-4 w-4 {label ? 'mr-1' : ''}" />
+										{/if}
+									{/if}
+									{#if label}
+										{t(label, $LL)}
+									{/if}
+								</button>
 							{/if}
 						</div>
 					{/each}
 				</div>
 			{/if}
 			<div class="md:ml-auto flex items-center gap-4">
+				{#if authEnabled && isLoggedIn && authProviders.length > 0}
+					<div class="text-sm text-footer-link text-nowrap inline-flex items-center gap-1">
+						<Key class="h-4 w-4 mr-0.5 flex-shrink-0" />
+						{#each authProviders as provider}
+							<Tooltip>
+								<button
+									type="button"
+									class="cursor-pointer hover:underline focus:outline-none focus:underline"
+									onclick={() => {
+										if (provider === 'web3') authNavActions.disconnect();
+										else authNavActions.signout();
+									}}
+								>
+									{provider.charAt(0).toUpperCase() + provider.slice(1)}
+								</button>
+								<svelte:fragment slot="content">
+									Disconnect {provider.charAt(0).toUpperCase() + provider.slice(1)}
+								</svelte:fragment>
+							</Tooltip>
+							{#if authProviders.indexOf(provider) < authProviders.length - 1}
+								<span class="opacity-70">•</span>
+							{/if}
+						{/each}
+					</div>
+				{/if}
 				<div class="flex items-center gap-2">
 					<span
 						class="status-dot inline-block w-1.5 h-1.5 rounded-full {connectionStatus

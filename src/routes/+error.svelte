@@ -1,9 +1,15 @@
 <script lang="ts">
 	import { ArrowRight, House, CircleAlert, MessageCircleQuestionMark, LifeBuoy } from 'lucide-svelte';
 	import { page } from '$app/state';
+	import { getSiteConfig } from '$lib/helpers/siteConfig';
 
 	export const data = {};
 	export let error: Error | null = null;
+	const _cfg = getSiteConfig();
+	const supportLink = _cfg?.url ? `mailto:support@${new URL(_cfg.url as string).hostname}` : undefined;
+	const organizationName = (_cfg?.organizationName as string) ?? '';
+	const projectName = (_cfg?.projectName as string) ?? '';
+	const communityUrl = `https://github.com/${organizationName}/${projectName}`;
 	$: status = page.status;
 
 	// Navigation items for different error scenarios
@@ -24,14 +30,14 @@
 					icon: MessageCircleQuestionMark,
 					title: 'Community',
 					desc: 'Seek the right answers in our community',
-					href: __SITE_CONFIG__.community?.url || ''
+					href: communityUrl
 				},
-				{
+				...(supportLink ? [{
 					icon: LifeBuoy,
 					title: 'Support',
 					desc: 'Contact our support team for assistance by email',
-					href: __SITE_CONFIG__.supportLink
-				}
+					href: supportLink
+				}] : [])
 			];
 		} else {
 			return [
@@ -40,15 +46,15 @@
 					icon: CircleAlert,
 					title: 'Report problem',
 					desc: 'Let us know about this issue so we can fix it',
-					href: `https://github.com/${__SITE_CONFIG__.organizationName}/${__SITE_CONFIG__.projectName}/issues`,
+					href: `https://github.com/${organizationName}/${projectName}/issues`,
 					target: '_blank'
 				},
-				{
+				...(supportLink ? [{
 					icon: LifeBuoy,
 					title: 'Support',
 					desc: 'Contact our support team for assistance by email',
-					href: __SITE_CONFIG__.supportLink
-				}
+					href: supportLink
+				}] : [])
 			];
 		}
 	};
