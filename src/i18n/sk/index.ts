@@ -5,11 +5,12 @@ import en from '../en/index';
 
 const skPartial: DeepPartial<Translation> = {
 	site: {
-		description: 'Mota ₡ore',
-		keywords: 'mota, ₡ore, blockchain, ican, payto, oric, corepass, txms'
+		description: 'MOTA',
+		keywords: 'mota, sveltekit, dapp, blockchain, moneyx, paypass, ican, payto, oric, corepass, txms'
 	},
 
 	common: {
+		account: 'Účet',
 		loading: 'Načítavam…',
 		error: 'Chyba',
 		success: 'Hotovo',
@@ -17,6 +18,7 @@ const skPartial: DeepPartial<Translation> = {
 		confirm: 'Potvrdiť',
 		close: 'Zatvoriť',
 		back: 'Späť',
+		menu: 'Menu',
 		next: 'Ďalej',
 		submit: 'Odoslať',
 		save: 'Uložiť',
@@ -56,11 +58,11 @@ const skPartial: DeepPartial<Translation> = {
 			requiredError: 'Core ID je povinné'
 		},
 		wallet: {
-			corePass: 'CorePass',
-			corePassNotConfigured: 'Rozšírenie CorePass nie je nakonfigurované.',
-			corePassNotInstalled: 'Rozšírenie CorePass nie je nainštalované alebo povolené.',
-			corePassCannotConnect: 'Nedá sa pripojiť k rozšíreniu CorePass.',
-			corePassDisconnected: 'CorePass bol odpojený.'
+			walletNotConfigured: 'Peňaženka nie je nakonfigurovaná.',
+			walletNotInstalled: 'Peňaženka nie je nainštalovaná alebo povolená.',
+			walletCannotConnect: 'Nedá sa pripojiť k peňaženke.',
+			walletConnected: 'Peňaženka pripojená.',
+			walletDisconnected: 'Peňaženka odpojená.'
 		}
 	},
 
@@ -68,6 +70,10 @@ const skPartial: DeepPartial<Translation> = {
 		home: 'Domov',
 		support: 'Podpora',
 		register: 'Registrácia',
+		login: 'Prihlásiť sa',
+		logout: 'Odhlásiť sa',
+		connect: 'Pripojiť sa',
+		disconnect: 'Odpojiť sa',
 		profile: 'Profil',
 		settings: 'Nastavenia'
 	},
@@ -78,50 +84,16 @@ const skPartial: DeepPartial<Translation> = {
 		applications: 'Aplikácie',
 		developers: 'Vývojári',
 		contact: 'Kontakt',
+		allianceMember: 'Člen PayTo aliancie',
 		termsOfService: 'Podmienky používania',
 		privacyPolicy: 'Zásady ochrany súkromia',
 		keyRegistry: 'Register kľúčov',
-		copyright: '© 2025–{year} Wall Money'
+		copyright: '© 2025–{year} MOTA'
 	},
 
-	auth: {
-		login: 'Prihlásiť sa',
-		logout: 'Odhlásiť sa',
-		register: 'Registrácia',
-		profile: 'Profil',
-		settings: 'Nastavenia',
-		connect: 'Pripojiť'
-	},
+	modules: {},
 
-	support: {
-		title: 'Podpora',
-		supportType: 'Typ podpory',
-		askAI: 'Opýtať sa AI',
-		createTicket: 'Vytvoriť tiket',
-		subject: 'Predmet',
-		question: 'Otázka',
-		followUpQuestion: 'Doplňujúca otázka',
-		askYourQuestion: 'Zadajte svoju otázku…',
-		send: 'Odoslať',
-		processing: 'Spracováva sa…',
-		sendTicketByEmail: 'Odoslať tiket e-mailom',
-		aiResponse: 'Odpoveď AI',
-		errors: {
-			pleaseEnterYourQuestion: 'Prosím, zadajte svoju otázku',
-			aiServiceNotAvailable: 'Služba AI nie je dostupná',
-			supportEmailNotConfigured: 'Podporný e-mail nie je nakonfigurovaný',
-			anErrorOccurredWhileAskingAI: 'Pri komunikácii s AI sa vyskytla chyba',
-			failedToGetAIResponse: 'Nepodarilo sa získať odpoveď od AI',
-			supportIsNotAvailable: 'Podpora nie je dostupná'
-		},
-		subjects: {
-			general: 'Všeobecné',
-			payments: 'Platby',
-			refunds: 'Vrátenie peňazí',
-			other: 'Iné'
-		}
-	}
-
+	content: {}
 };
 
 const sk: Translation = deepMergeDict(en as any, skPartial as DeepPartial<Translation>);

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-svelte';
-	import { Icon } from '$lib/components';
+	import { Icon } from '$components';
+	import { asDynamicIcon } from '$lib/helpers/icon';
+
+	type NavIcon = string | import('svelte').Component | (new (...args: any[]) => unknown);
 
 	let {
 		isOpen = false,
@@ -13,14 +16,14 @@
 	}: {
 		isOpen?: boolean;
 		title?: string;
-		icon?: string;
+		icon?: NavIcon;
 		items?: Array<{
 			label: string;
 			to?: string;
 			href?: string;
 			target?: string;
 			rel?: string;
-			icon?: string;
+			icon?: NavIcon;
 			className?: string;
 			active?: boolean;
 		}>;
@@ -73,7 +76,12 @@
 	<div class="w-5"></div> <!-- Left spacer to balance the chevron -->
 	<div class="flex items-center justify-center flex-1">
 		{#if icon}
-			<Icon name={icon} className="h-5 w-5 mr-1.5" />
+			{#if typeof icon === 'string'}
+				<Icon name={icon} className="h-5 w-5 mr-1.5" />
+			{:else}
+				{@const IconC = asDynamicIcon(icon)}
+				<IconC class="h-5 w-5 mr-1.5" />
+			{/if}
 		{/if}
 		<span>{title}</span>
 	</div>
@@ -110,7 +118,12 @@
 									>
 										<div class="flex items-center">
 											{#if item.icon}
-												<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{#if typeof item.icon === 'string'}
+													<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{:else}
+													{@const IconC = asDynamicIcon(item.icon)}
+													<IconC class="h-5 w-5 mr-1.5" />
+												{/if}
 											{/if}
 											<span>{item.label}</span>
 										</div>
@@ -123,7 +136,12 @@
 									>
 										<div class="flex items-center">
 											{#if item.icon}
-												<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{#if typeof item.icon === 'string'}
+													<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{:else}
+													{@const IconC = asDynamicIcon(item.icon)}
+													<IconC class="h-5 w-5 mr-1.5" />
+												{/if}
 											{/if}
 											<span>{item.label}</span>
 											{#if typeof iconExternal === 'undefined' || iconExternal === true}
@@ -139,7 +157,12 @@
 									>
 										<div class="flex items-center">
 											{#if item.icon}
-												<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{#if typeof item.icon === 'string'}
+													<Icon name={item.icon} className="h-5 w-5 mr-1.5" />
+												{:else}
+													{@const IconC = asDynamicIcon(item.icon)}
+													<IconC class="h-5 w-5 mr-1.5" />
+												{/if}
 											{/if}
 											<span>{item.label}</span>
 										</div>

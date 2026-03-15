@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
-	const { style } = __SITE_CONFIG__?.themeConfig?.navbar || {};
+	import { getSiteConfig } from '$lib/helpers/siteConfig';
+	const { style } = (getSiteConfig()?.themeConfig as { navbar?: { style?: string } } | undefined)?.navbar || {};
 
 	export function toastType(type: string): string {
 		if (style === 'blur') {
@@ -37,6 +38,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { toasts, toast } from './toastStore';
+	import { X } from 'lucide-svelte';
 
 	function handleMouseEnter(id: string) {
 		toast.pause(id);
@@ -61,10 +63,10 @@
 			on:mouseenter={() => handleMouseEnter(id)}
 			on:mouseleave={() => handleMouseLeave(id)}
 		>
-			<div class="flex justify-between items-center">
+			<div class="flex justify-between items-start">
 				<span>{message}</span>
-				<button class="ml-2 bg-transparent" on:click={() => closeToast(id)} aria-label="Close">
-					&times;
+				<button class="ml-2 shrink-0 p-0.5 rounded hover:bg-white/20 dark:hover:bg-slate-800/30 mt-0.5" on:click={() => closeToast(id)} aria-label="Close">
+					<X size={16} />
 				</button>
 			</div>
 		</div>

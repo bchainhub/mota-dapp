@@ -11,12 +11,13 @@ export function getGeoData(event: RequestEvent): void {
 	if (!event.platform && !event.request) {
 		return;
 	}
+	const env = privateDynamicEnv?.env;
 	// Cloudflare Workers: Access geographical data via platform.cf
 	if (event.platform?.cf) {
-		if (privateDynamicEnv.env.CAPTURE_COUNTRY && event.platform.cf.country) {
+		if (env?.CAPTURE_COUNTRY && event.platform.cf.country) {
 			event.locals.country = event.platform.cf.country;
 		}
-		if (privateDynamicEnv.env.CAPTURE_CITY && event.platform.cf.city) {
+		if (env?.CAPTURE_CITY && event.platform.cf.city) {
 			event.locals.city = event.platform.cf.city;
 		}
 		return;
@@ -26,10 +27,10 @@ export function getGeoData(event: RequestEvent): void {
 	const vercelCountry = event.request.headers.get('x-vercel-ip-country');
 	const vercelCity = event.request.headers.get('x-vercel-ip-city');
 	if (vercelCountry || vercelCity) {
-		if (privateDynamicEnv.env.CAPTURE_COUNTRY && vercelCountry) {
+		if (env?.CAPTURE_COUNTRY && vercelCountry) {
 			event.locals.country = vercelCountry;
 		}
-		if (privateDynamicEnv.env.CAPTURE_CITY && vercelCity) {
+		if (env?.CAPTURE_CITY && vercelCity) {
 			event.locals.city = vercelCity;
 		}
 		return;
@@ -39,10 +40,10 @@ export function getGeoData(event: RequestEvent): void {
 	const netlifyCountry = event.request.headers.get('x-nf-country');
 	const netlifyCity = event.request.headers.get('x-nf-city');
 	if (netlifyCountry || netlifyCity) {
-		if (privateDynamicEnv.env.CAPTURE_COUNTRY && netlifyCountry) {
+		if (env?.CAPTURE_COUNTRY && netlifyCountry) {
 			event.locals.country = netlifyCountry;
 		}
-		if (privateDynamicEnv.env.CAPTURE_CITY && netlifyCity) {
+		if (env?.CAPTURE_CITY && netlifyCity) {
 			event.locals.city = netlifyCity;
 		}
 		return;

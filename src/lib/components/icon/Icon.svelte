@@ -1,5 +1,21 @@
 <script lang="ts">
-	import { House, Link, WalletCards, BanknoteArrowUp, Cuboid, LogIn, Languages } from 'lucide-svelte';
+	import {
+		Atom,
+		BanknoteArrowUp,
+		Cuboid,
+		House,
+		Key,
+		Languages,
+		Link,
+		LogIn,
+		LogOut,
+		MessageCircleQuestionMark,
+		Plug,
+		Unplug,
+		Upload,
+		Wallet,
+		WalletCards
+	} from 'lucide-svelte';
 
 	export let name: string;
 	export let className: string = '';
@@ -16,10 +32,18 @@
 		home: House,
 		link: Link,
 		wallet: WalletCards,
+		walletMenu: Wallet,
+		key: Key,
 		banknoteUp: BanknoteArrowUp,
 		cuboid: Cuboid,
 		login: LogIn,
-		languages: Languages
+		logout: LogOut,
+		register: Upload,
+		connect: Plug,
+		disconnect: Unplug,
+		languages: Languages,
+		atom: Atom,
+		support: MessageCircleQuestionMark
 	};
 
 	$: IconComponent = typeof icons[name] === 'string' ? null : icons[name];
@@ -29,7 +53,7 @@
 {#if IconComponent}
 	<svelte:component this={IconComponent} class={className} />
 {:else if iconInsertion}
-	<span class={`inline-block ${className}`}>{@html iconInsertion}</span>
+	<span class={className}>{@html iconInsertion}</span>
 {:else}
 	<span class={`text-center ${className}`}>×</span>
 {/if}

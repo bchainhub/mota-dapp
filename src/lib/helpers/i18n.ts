@@ -1,6 +1,8 @@
 import { browser } from '$app/environment';
+import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
+import { getSiteConfig } from '$lib/helpers/siteConfig';
 
-const config = (typeof __SITE_CONFIG__ !== 'undefined' ? __SITE_CONFIG__ : {})?.language;
+const config = getSiteConfig()?.language;
 
 // -----------------------------
 // Locale types
@@ -106,7 +108,7 @@ export const getAvailableLocalesWithNames = (): Array<{ code: string; name: stri
 export const getLocale = (): string => {
 	if (!config?.enabled) return 'en';
 	if (browser) {
-		return localStorage.getItem('locale') || config?.defaultLocale || 'en';
+		return getStoredLocale() || config?.defaultLocale || 'en';
 	}
 	return config?.defaultLocale || 'en';
 };
@@ -120,15 +122,15 @@ export const applyLocale = async (locale: string) => {
 		try {
 			// Try to load the async i18n utilities if they exist
 			// @ts-ignore - i18n-util.async may not exist if translations are not set up
-			const { loadLocaleAsync } = await import('../../i18n/i18n-util.async');
+			const { loadLocaleAsync } = await import('$lang/i18n-util.async');
 			await loadLocaleAsync(locale as any);
 		} catch (error) {
 			// If i18n-util.async doesn't exist, we're not using translations
 		}
-		localStorage.setItem('locale', locale);
+		setStoredLocale(locale);
 	}
 
-	const { setLocale: i18nSetLocale } = await import('../../i18n/i18n-svelte');
+	const { setLocale: i18nSetLocale } = await import('$lang/i18n-svelte');
 	i18nSetLocale(locale as any);
 };
 
@@ -137,7 +139,7 @@ export const loadLocaleAsync = async (locale: string) => {
 	if (!config?.enabled) return;
 	try {
 		// @ts-ignore - i18n-util.async may not exist if translations are not set up
-		const { loadLocaleAsync } = await import('../../i18n/i18n-util.async');
+		const { loadLocaleAsync } = await import('$lang/i18n-util.async');
 		await loadLocaleAsync(locale as any);
 	} catch (error) {
 		// If i18n-util.async doesn't exist, we're not using translations

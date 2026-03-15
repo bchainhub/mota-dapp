@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import type { Config } from 'vite-plugin-config';
 import tailwindcss from '@tailwindcss/vite';
+declare const process: { env: Record<string, string | undefined> };
 
 // Language configuration
 const languageConfig = {
@@ -18,26 +19,29 @@ const languageConfig = {
 	autoDetect: true
 };
 
-const siteConfig: Config = {
-	title: 'Mota ₡ore', // Site title - keep `₡ore` if you want to let people know it's powered by Core Infra
-	url: 'http://localhost:5173', // Site domain
+const siteUrl = process.env.PUBLIC_SITE_URL || 'http://localhost:5173'; // Site domain
+
+// ─── Client config (no server-only keys; used in define and client bundles) ───
+const siteConfigClient: Config = {
+	title: 'MOTA dApp ₡ore', // Site title - keep `₡ore` if you want to let people know it's powered by Core Infra
+	url: siteUrl,
 	organizationName: 'bchainhub', // Organization name - In most cases it's your GitHub username
 	projectName: 'sveltekit-mota', // Project name - In most cases it's your repo name
-	supportLink: 'https://github.com/bchainhub/sveltekit-mota/issues', // Support link - In most cases it's your GitHub issues page
 	favicon: '/img/icons/favicon.png', // Favicon path in static folder
+	language: languageConfig,
 	themeConfig: {
 		navbar: {
 			logo: {
 				src: '/img/logo.svg', // Logo path in static folder
 				srcDark: '/img/logo-dark.svg', // Logo path in static folder
-				alt: 'Mota', // Logo alt attribute
-				appendTitle: false // Append title to logo
+				alt: 'MOTA' // Logo alt attribute
 			},
 			style: 'blur', // Navbar style (auto, blur, transparent)
 			orientation: 'horizontal', // Navbar orientation (horizontal, vertical)
 			hideOnScroll: false, // Hide navbar on scroll down
 			iconExternal: true, // Icon for external links
 			leftItemsPosition: 'center', // Left items position (left, center)
+			// Use `to` for internal links; use string action keys for connect/disconnect (manualConnect, disconnectWallet).
 			items: [
 				// Navbar items
 				{
@@ -47,27 +51,10 @@ const siteConfig: Config = {
 					icon: 'home'
 				},
 				{
-					label: 'navbar.support',
-					to: '/support',
-					position: 'left'
-				},
-				{
-					label: 'navbar.register',
-					to: '/register',
-					position: 'right',
-					icon: 'corepass',
-					className: 'border border-white rounded-full px-4 py-2'
-				}
-			],
-			authItems: [
-				// Auth items
-				{
-					label: 'navbar.profile',
-					to: '/profile'
-				},
-				{
-					label: 'navbar.settings',
-					to: '/settings'
+					label: 'navbar.repo',
+					href: 'https://github.com/bchainhub/sveltekit-mota',
+					position: 'left',
+					icon: 'github'
 				}
 			]
 		},
@@ -75,7 +62,7 @@ const siteConfig: Config = {
 			style: 'transparent', // Footer style (auto, dark, light, transparent)
 			logo: {
 				src: '/img/logo-footer.svg', // Logo path in static folder
-				alt: 'Mota' // Logo alt attribute
+				alt: 'MOTA' // Logo alt attribute
 			},
 			iconExternal: true, // Icon for external links
 			links: [
@@ -83,32 +70,13 @@ const siteConfig: Config = {
 				{
 					title: 'footer.ecosystem',
 					items: [
-						{ label: 'footer.onRamp', href: 'https://coreport.net', target: '_blank' },
-						{ label: 'footer.moneyX', href: 'https://moneyx.forex', target: '_blank' },
-						{ label: 'footer.commodities', href: 'https://payto.money', target: '_blank' }
-					]
-				},
-				{
-					title: 'footer.applications',
-					items: [
-						{ label: 'footer.corePass', href: 'https://corepass.net', target: '_blank' },
-						{ label: 'footer.oricRegistry', href: 'https://payto.onl/services/oric', target: '_blank' }
-					]
-				},
-				{
-					title: 'footer.developers',
-					items: [
-						{ label: 'footer.exchangeRates', href: 'https://moneyx.forex/exchange-rates', target: '_blank' },
-						{ label: 'footer.merchants', href: 'https://coreport.net/generate', target: '_blank' },
-						{ label: 'footer.api', href: 'https://postman.com', target: '_blank' }
+						{ label: 'footer.repo', href: 'https://github.com/bchainhub/sveltekit-mota', target: '_blank' },
 					]
 				},
 				{
 					title: 'footer.contact',
 					items: [
-						{ label: 'footer.emailContact', to: 'mailto:support@mota' },
-						{ label: 'footer.support', to: '/support' },
-						{ label: 'footer.coreTalk', href: 'https://coretalk.space', target: '_blank' }
+						{ label: 'footer.emailContact', to: 'mailto:support@mota.mota' }
 					]
 				}
 			],
@@ -129,7 +97,7 @@ const siteConfig: Config = {
 		metadata: [
 			{ name: 'viewport', content: 'width=device-width, initial-scale=1.0' }, // Viewport meta tag
 			{ name: 'theme-color', content: '#25c19f' }, // Theme color meta tag
-			{ name: 'description', content: 'This is SvetleKit Boilerplate website' }, // Description meta tag
+			{ name: 'description', content: 'This is MOTA dApp website' }, // Description meta tag
 			{ name: 'keywords', content: 'mota, website, sveltekit, vite' }, // Keywords meta tag
 			{ property: 'og:type', content: 'website' }, // Open Graph type meta tag
 		],
@@ -139,46 +107,10 @@ const siteConfig: Config = {
 			respectPrefersColorScheme: true // Respect browser color scheme preference
 		}
 	},
-	community: {
-		url: 'https://github.com/bchainhub/sveltekit-mota'
+	api: {
+		enabled: false
 	},
-	auth: {
-		enabled: false,
-		title: 'auth.login',
-		icon: 'login',
-		strategy: 'passkey',
-		passkey: {
-			aaguid: [],
-			algorithms: ['ES256', 'ES384', 'ES512', 'RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'],
-			attestation: 'none', // None attestation - privacy-friendly
-			authenticatorAttachment: 'cross-platform', // Allow both built-in and external authenticators (QR code)
-			origin: 'https://mota.web', // Origin of the passkey
-			residentKey: 'preferred', // Discoverable credentials preferred
-			rpId: 'mota.web', // RP ID of the passkey
-			rpName: 'MOTA', // RP Name of the passkey
-			timeout: 60000, // 60 seconds timeout
-			userVerification: 'required', // Must perform biometric/PIN check
-		},
-		web3: {
-			provider: 'corepass',
-			methods: {
-				requestAccounts: 'xcb_requestAccounts'
-			}
-		}
-	},
-	support: {
-		enabled: true,
-		email: 'support@bonded.gold',
-		ai: {
-			enabled: true,
-			model: 'gpt-4o-mini',
-			systemMessage: 'You are a helpful support assistant. Provide clear, accurate, and helpful answers.',
-			subjects: ['payments', 'refunds', 'other'],
-			temperature: 0.4,
-			maxTokens: 150
-		}
-	},
-	language: languageConfig
+	modules: {}
 };
 
 export default defineConfig({
@@ -188,11 +120,15 @@ export default defineConfig({
 		VitePWA({
 			registerType: 'autoUpdate',
 			includeAssets: ['/icons/favicon.svg', 'robots.txt', '/icons/apple-touch-icon.png'],
+			workbox: {
+				// SvelteKit does not output index.html in precache; disable default fallback to avoid "non-precached-url" error.
+				navigateFallback: null
+			},
 			manifest: {
-				name: 'Mota',
-				short_name: 'WM',
-				description: 'MOTA Starter Pack',
-				theme_color: '#45a699',
+				name: 'MOTA',
+				short_name: 'MOTA',
+				description: 'MOTA dApp',
+				theme_color: '#25c19f',
 				icons: [
 					{
 						src: '/icons/192.png',
@@ -215,6 +151,7 @@ export default defineConfig({
 		})
 	],
 	define: {
-		__SITE_CONFIG__: JSON.stringify(siteConfig)
+		__SITE_CONFIG__: JSON.stringify(siteConfigClient),
+		'import.meta.env.DEV': process.env.DEV_MODE === '1'
 	}
 });

@@ -1,7 +1,10 @@
 <script lang="ts">
-	import { Icon } from '$lib/components';
+	import { Icon } from '$components';
+	import { asDynamicIcon } from '$lib/helpers/icon';
 	import { ArrowUpRight, ChevronDown, ChevronRight } from 'lucide-svelte';
 	import { onMount } from 'svelte';
+
+	type NavIcon = string | import('svelte').Component | (new (...args: any[]) => unknown);
 
 	let {
 		title = '',
@@ -14,14 +17,14 @@
 		theme = 'blur'
 	}: {
 		title?: string;
-		icon?: string;
+		icon?: NavIcon;
 		items?: Array<{
 			label?: string;
 			to?: string;
 			href?: string;
 			target?: string;
 			rel?: string;
-			icon?: string;
+			icon?: NavIcon;
 			className?: string;
 			active?: boolean;
 		}>;
@@ -70,7 +73,12 @@
 		aria-haspopup="true"
 	>
 		{#if icon}
-			<Icon name={icon} className="h-5 w-5 {title ? 'mr-1.5' : ''}" />
+			{#if typeof icon === 'string'}
+				<Icon name={icon} className="h-5 w-5 {title ? 'mr-1.5' : ''}" />
+			{:else}
+				{@const IconC = asDynamicIcon(icon)}
+				<IconC class="h-5 w-5 {title ? 'mr-1.5' : ''}" />
+			{/if}
 		{/if}
 		{#if title}
 			<span class="whitespace-nowrap">{title}</span>
@@ -94,7 +102,12 @@
 							class="w-full flex items-center justify-start px-4 py-2 text-left hover:bg-slate-700 transition-colors text-slate-300 {item.active ? 'bg-slate-700' : ''} {item.className}"
 						>
 							{#if item.icon}
-								<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{#if typeof item.icon === 'string'}
+									<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{:else}
+									{@const IconC = asDynamicIcon(item.icon)}
+									<IconC class="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{/if}
 							{/if}
 							{#if item.label}
 								<span class="whitespace-nowrap">{item.label}</span>
@@ -107,7 +120,12 @@
 							class="w-full flex items-center justify-start px-4 py-2 text-left hover:bg-slate-700 transition-colors text-slate-300 {item.active ? 'bg-slate-700' : ''} {item.className}"
 						>
 							{#if item.icon}
-								<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{#if typeof item.icon === 'string'}
+									<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{:else}
+									{@const IconC = asDynamicIcon(item.icon)}
+									<IconC class="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{/if}
 							{/if}
 							{#if item.label}
 								<span class="whitespace-nowrap">{item.label}</span>
@@ -123,7 +141,12 @@
 							class="w-full flex items-center justify-start px-4 py-2 text-left hover:bg-slate-700 transition-colors text-slate-300 {item.active ? 'bg-slate-700' : ''} {item.className}"
 						>
 							{#if item.icon}
-								<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{#if typeof item.icon === 'string'}
+									<Icon name={item.icon} className="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{:else}
+									{@const IconC = asDynamicIcon(item.icon)}
+									<IconC class="h-5 w-5 {item.label ? 'mr-1.5' : ''}" />
+								{/if}
 							{/if}
 							{#if item.label}
 								<span class="whitespace-nowrap">{item.label}</span>

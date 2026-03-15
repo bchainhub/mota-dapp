@@ -5,11 +5,12 @@ import en from '../en/index';
 
 const ruPartial: DeepPartial<Translation> = {
 	site: {
-		description: 'Mota ₡ore',
-		keywords: 'mota, ₡ore, blockchain, ican, payto, oric, corepass, txms'
+		description: 'MOTA',
+		keywords: 'mota, sveltekit, dapp, blockchain, moneyx, paypass, ican, payto, oric, corepass, txms'
 	},
 
 	common: {
+		account: 'Аккаунт',
 		loading: 'Загрузка…',
 		error: 'Ошибка',
 		success: 'Успешно',
@@ -17,6 +18,7 @@ const ruPartial: DeepPartial<Translation> = {
 		confirm: 'Подтвердить',
 		close: 'Закрыть',
 		back: 'Назад',
+		menu: 'Меню',
 		next: 'Далее',
 		submit: 'Отправить',
 		save: 'Сохранить',
@@ -56,11 +58,11 @@ const ruPartial: DeepPartial<Translation> = {
 			requiredError: 'Core ID обязателен для заполнения'
 		},
 		wallet: {
-			corePass: 'CorePass',
-			corePassNotConfigured: 'Расширение CorePass не настроено.',
-			corePassNotInstalled: 'Расширение CorePass не установлено или не включено.',
-			corePassCannotConnect: 'Не удаётся подключить расширение CorePass.',
-			corePassDisconnected: 'CorePass отключён.'
+			walletNotConfigured: 'Кошелёк не настроен.',
+			walletNotInstalled: 'Кошелёк не установлен или не включён.',
+			walletCannotConnect: 'Не удаётся подключить кошелёк.',
+			walletConnected: 'Кошелёк подключён.',
+			walletDisconnected: 'Кошелёк отключён.'
 		}
 	},
 
@@ -68,6 +70,10 @@ const ruPartial: DeepPartial<Translation> = {
 		home: 'Главная',
 		support: 'Поддержка',
 		register: 'Регистрация',
+		login: 'Войти',
+		logout: 'Выйти',
+		connect: 'Подключить',
+		disconnect: 'Отключить',
 		profile: 'Профиль',
 		settings: 'Настройки'
 	},
@@ -78,50 +84,16 @@ const ruPartial: DeepPartial<Translation> = {
 		applications: 'Приложения',
 		developers: 'Разработчикам',
 		contact: 'Контакты',
+		allianceMember: 'Член PayTo альянса',
 		termsOfService: 'Условия обслуживания',
 		privacyPolicy: 'Политика конфиденциальности',
 		keyRegistry: 'Реестр ключей',
-		copyright: '© 2025–{year} Wall Money'
+		copyright: '© 2025–{year} MOTA'
 	},
 
-	auth: {
-		login: 'Войти',
-		logout: 'Выйти',
-		register: 'Регистрация',
-		profile: 'Профиль',
-		settings: 'Настройки',
-		connect: 'Подключить'
-	},
+	modules: {},
 
-	support: {
-		title: 'Поддержка',
-		supportType: 'Тип поддержки',
-		askAI: 'Спросить ИИ',
-		createTicket: 'Создать тикет',
-		subject: 'Тема',
-		question: 'Вопрос',
-		followUpQuestion: 'Дополнительный вопрос',
-		askYourQuestion: 'Задайте свой вопрос…',
-		send: 'Отправить',
-		processing: 'Обработка…',
-		sendTicketByEmail: 'Отправить тикет по электронной почте',
-		aiResponse: 'Ответ ИИ',
-		errors: {
-			pleaseEnterYourQuestion: 'Пожалуйста, введите ваш вопрос',
-			aiServiceNotAvailable: 'Сервис ИИ недоступен',
-			supportEmailNotConfigured: 'Электронная почта поддержки не настроена',
-			anErrorOccurredWhileAskingAI: 'Произошла ошибка при обращении к ИИ',
-			failedToGetAIResponse: 'Не удалось получить ответ от ИИ',
-			supportIsNotAvailable: 'Поддержка недоступна'
-		},
-		subjects: {
-			general: 'Общие',
-			payments: 'Платежи',
-			refunds: 'Возвраты',
-			other: 'Другое'
-		}
-	}
-
+	content: {}
 };
 
 const ru: Translation = deepMergeDict(en as any, ruPartial as DeepPartial<Translation>);

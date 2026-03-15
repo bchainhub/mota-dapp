@@ -3,9 +3,12 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
-	import { Icon } from '$lib/components';
+	import { Icon } from '$components';
 	import { onMount } from 'svelte';
 	import { applyLocale } from '$lib/helpers/i18n';
+	import { getStoredLocale } from '$lib/helpers/storageKeys';
+	import { getSiteConfig } from '$lib/helpers/siteConfig';
+	import { locale as localeStore } from '$lang/i18n-svelte';
 
 	let {
 		currentLocale = 'en',
@@ -26,13 +29,14 @@
 	let isOpen = $state(false);
 	let dropdownRef: HTMLDivElement;
 
-	let actualCurrentLocale = $state(currentLocale);
+	// Use i18n locale store so selection persists across navigations (not just page.data.locale)
+	const actualCurrentLocale = $derived($localeStore ?? currentLocale);
 
-	// Update current locale from localStorage
+	// When storage changes (e.g. another tab), apply so this tab’s locale store updates
 	function updateCurrentLocale() {
 		if (browser) {
-			const stored = localStorage.getItem('locale');
-			actualCurrentLocale = stored || currentLocale;
+			const stored = getStoredLocale();
+			if (stored) applyLocale(stored);
 		}
 	}
 
@@ -49,11 +53,8 @@
 	async function changeLanguage(locale: string) {
 		if (locale === actualCurrentLocale) return;
 
-		// Use i18n helper to apply locale
+		// Use i18n helper to apply locale (updates locale store; UI follows)
 		await applyLocale(locale);
-
-		// Update current locale immediately
-		actualCurrentLocale = locale;
 
 		// Update URL
 		const currentPath = page.url.pathname;
@@ -111,7 +112,7 @@
 		aria-haspopup="true"
 	>
 		<Icon name="languages" />
-        {#if __SITE_CONFIG__?.language?.showName}
+        {#if (getSiteConfig()?.language as { showName?: boolean } | undefined)?.showName}
 		    <span class="whitespace-nowrap">{currentLanguageName}</span>
 		{/if}
 		{#if orientation === 'vertical'}
