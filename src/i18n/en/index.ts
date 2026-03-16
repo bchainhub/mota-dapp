@@ -28,27 +28,10 @@ const en: BaseTranslation = {
 			light: 'Light',
 			dark: 'Dark',
 			system: 'System'
-		},
-		keys: {
-			keyRegistry: 'Keys Registry',
-			welcome: 'Welcome to the Keys Registry. Here you can find all types of keys for our services.',
-			keyTypes: 'Key Types',
-			keyTypeRegistry: '{key} Keys Registry',
-			welcomeTypeRegistry: 'Registry for {key} keys. Here you can find all keys used in our services.',
-			keyTypeInfo: 'Key Types',
-			publicKeyFor: 'Public Key for {keyName}',
-			keyId: 'Key ID: {keyId}',
-			copyKey: 'Copy Key',
-			downloadKey: 'Download {keyName}',
-			viewOnKeyServer: 'View on Key Server'
 		}
 	},
 
 	helpers: {
-		keys: {
-			copiedToClipboard: 'Key copied to clipboard',
-			failedToCopy: 'Failed to copy key'
-		},
 		coreIdValidation: {
 			error: 'Please enter a valid Core ID',
 			enterpriseError: 'Enterprise network addresses cannot be used for payments',

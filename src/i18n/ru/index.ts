@@ -31,27 +31,10 @@ const ruPartial: DeepPartial<Translation> = {
 			light: 'Светлая',
 			dark: 'Тёмная',
 			system: 'Системная'
-		},
-		keys: {
-			keyRegistry: 'Реестр ключей',
-			welcome: 'Добро пожаловать в Реестр ключей. Здесь вы можете найти все виды ключей для наших сервисов.',
-			keyTypes: 'Типы ключей',
-			keyTypeRegistry: 'Реестр ключей {key}',
-			welcomeTypeRegistry: 'Реестр для ключей {key}. Здесь вы можете найти все ключи, используемые в наших сервисах.',
-			keyTypeInfo: 'Типы ключей',
-			publicKeyFor: 'Публичный ключ для {keyName}',
-			keyId: 'ID ключа: {keyId}',
-			copyKey: 'Копировать ключ',
-			downloadKey: 'Скачать {keyName}',
-			viewOnKeyServer: 'Посмотреть на сервере ключей'
 		}
 	},
 
 	helpers: {
-		keys: {
-			copiedToClipboard: 'Ключ скопирован в буфер обмена',
-			failedToCopy: 'Не удалось скопировать ключ'
-		},
 		coreIdValidation: {
 			error: 'Пожалуйста, введите корректный Core ID',
 			enterpriseError: 'Адреса корпоративной сети не могут использоваться для платежей',
