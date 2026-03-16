@@ -7,10 +7,10 @@
 		MOTA
 	</h1>
 	<p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-2xl mb-2">
-		dApp framework for the multi-chain web
+		ĐApp framework for the multi-chain web
 	</p>
 	<p class="text-base text-gray-500 dark:text-gray-400 max-w-xl mb-12">
-		Type-safe, extensible SvelteKit apps. Core Blockchain first, multiple chains supported.
+		Type-safe, extensible SvelteKit apps. Powered by ₡ore, multiple chains supported.
 	</p>
 	<a
 		href="https://github.com/bchainhub/dapp-starter"
@@ -37,7 +37,7 @@
 			</div>
 			<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">SvelteKit at the core</h3>
 			<p class="text-gray-600 dark:text-gray-400 text-sm">
-				MOTA is a dApp framework built on <a href="https://kit.svelte.dev" target="_blank" rel="noopener noreferrer" class="underline">SvelteKit</a>. Fast, SSR-ready, and great DX out of the box.
+				MOTA is a ĐApp framework built on <a href="https://kit.svelte.dev" target="_blank" rel="noopener noreferrer" class="underline">SvelteKit</a>. Fast, SSR-ready, and great DX out of the box.
 			</p>
 		</div>
 
@@ -51,7 +51,7 @@
 			</div>
 			<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Core + multi-chain</h3>
 			<p class="text-gray-600 dark:text-gray-400 text-sm">
-				Runs on <strong>Core Blockchain</strong> by default and supports multiple chains. One codebase, many networks.
+				Runs on <strong>₡ore</strong> by default and supports multiple chains. One codebase, many networks.
 			</p>
 		</div>
 
@@ -86,7 +86,7 @@
 			</div>
 			<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Agent skills</h3>
 			<p class="text-gray-600 dark:text-gray-400 text-sm mb-3">
-				MOTA projects can use <a href="https://skills.sh" target="_blank" rel="noopener noreferrer" class="underline">skills.sh</a>: reusable skill packs that AI agents (Cursor, Copilot, Continue) use to work with your stack. Add Core Blockchain Skills, MOTA Skills, or any repo.
+				MOTA projects can use <a href="https://skills.sh" target="_blank" rel="noopener noreferrer" class="underline">skills.sh</a>: reusable skill packs that AI agents (Cursor, Copilot, Continue) use to work with your stack. Add MOTA Skills, or any repo.
 			</p>
 			<pre class="overflow-x-auto rounded-lg bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 p-3 text-xs"><code>npx skills find   # discover skills · npx skills add owner/repo</code></pre>
 		</div>
