@@ -27,7 +27,7 @@ const siteConfigClient: Config = {
 	title: 'MOTA ĐApp ₡ore', // Site title - keep `₡ore` if you want to let people know it's powered by Core Infra
 	url: siteUrl,
 	organizationName: 'bchainhub', // Organization name - In most cases it's your GitHub username
-	projectName: 'sveltekit-mota', // Project name - In most cases it's your repo name
+	projectName: 'mota-dapp', // Project name - In most cases it's your repo name
 	favicon: '/img/icons/favicon.png', // Favicon path in static folder
 	language: languageConfig,
 	themeConfig: {
@@ -53,7 +53,7 @@ const siteConfigClient: Config = {
 				},
 				{
 					label: 'navbar.repo',
-					href: 'https://github.com/bchainhub/sveltekit-mota',
+					href: 'https://github.com/bchainhub/mota-dapp',
 					position: 'left',
 					icon: 'github'
 				}
@@ -71,7 +71,7 @@ const siteConfigClient: Config = {
 				{
 					title: 'footer.ecosystem',
 					items: [
-						{ label: 'footer.repo', href: 'https://github.com/bchainhub/sveltekit-mota', target: '_blank' },
+						{ label: 'footer.repo', href: 'https://github.com/bchainhub/mota-dapp', target: '_blank' },
 					]
 				},
 				{
