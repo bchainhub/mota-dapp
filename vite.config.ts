@@ -50,12 +50,6 @@ const siteConfigClient: Config = {
 					to: '/',
 					position: 'left',
 					icon: 'home'
-				},
-				{
-					label: 'navbar.repo',
-					href: 'https://github.com/bchainhub/mota-dapp',
-					position: 'left',
-					icon: 'github'
 				}
 			]
 		},
