@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import type { Config } from 'vite-plugin-config';
 import tailwindcss from '@tailwindcss/vite';
+import { resolveExtensionlessPlugin } from './src/lib/helpers/vite-resolve-extensionless';
 declare const process: { env: Record<string, string | undefined> };
 
 // Language configuration
@@ -23,7 +24,7 @@ const siteUrl = process.env.PUBLIC_SITE_URL || 'http://localhost:5173'; // Site 
 
 // ─── Client config (no server-only keys; used in define and client bundles) ───
 const siteConfigClient: Config = {
-	title: 'MOTA dApp ₡ore', // Site title - keep `₡ore` if you want to let people know it's powered by Core Infra
+	title: 'MOTA ĐApp ₡ore', // Site title - keep `₡ore` if you want to let people know it's powered by Core Infra
 	url: siteUrl,
 	organizationName: 'bchainhub', // Organization name - In most cases it's your GitHub username
 	projectName: 'sveltekit-mota', // Project name - In most cases it's your repo name
@@ -97,7 +98,7 @@ const siteConfigClient: Config = {
 		metadata: [
 			{ name: 'viewport', content: 'width=device-width, initial-scale=1.0' }, // Viewport meta tag
 			{ name: 'theme-color', content: '#25c19f' }, // Theme color meta tag
-			{ name: 'description', content: 'This is MOTA dApp website' }, // Description meta tag
+			{ name: 'description', content: 'This is MOTA ĐApp website' }, // Description meta tag
 			{ name: 'keywords', content: 'mota, website, sveltekit, vite' }, // Keywords meta tag
 			{ property: 'og:type', content: 'website' }, // Open Graph type meta tag
 		],
@@ -115,6 +116,7 @@ const siteConfigClient: Config = {
 
 export default defineConfig({
 	plugins: [
+		resolveExtensionlessPlugin(),
 		tailwindcss(),
 		sveltekit(),
 		VitePWA({
@@ -127,7 +129,7 @@ export default defineConfig({
 			manifest: {
 				name: 'MOTA',
 				short_name: 'MOTA',
-				description: 'MOTA dApp',
+				description: 'MOTA ĐApp',
 				theme_color: '#25c19f',
 				icons: [
 					{
@@ -153,5 +155,8 @@ export default defineConfig({
 	define: {
 		__SITE_CONFIG__: JSON.stringify(siteConfigClient),
 		'import.meta.env.DEV': process.env.DEV_MODE === '1'
+	},
+	ssr: {
+		noExternal: ['lucide-svelte']
 	}
 });
