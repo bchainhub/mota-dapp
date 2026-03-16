@@ -1,6 +1,6 @@
 // Stub: no typesafe-i18n dependency. Replaced by typesafe-i18n when "Install translations" is used.
 /* eslint-disable */
-import { writable } from 'svelte/store';
+import { readable, writable } from 'svelte/store';
 import type { Locales, TranslationFunctions, Translations } from './i18n-types';
 
 export const locale = writable<Locales>('en');
@@ -18,7 +18,9 @@ function makeLL(path: string[] = []): TranslationFunctions {
 	);
 }
 
-export const LL = makeLL() as unknown as Translations;
+/** Exported as a store so Svelte's $LL subscription and unsubscribe work during SSR. */
+const llValue = makeLL() as unknown as Translations;
+export const LL = readable(llValue);
 
 export function setLocale(l: Locales): void {
 	locale.set(l);
