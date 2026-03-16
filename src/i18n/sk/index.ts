@@ -31,27 +31,10 @@ const skPartial: DeepPartial<Translation> = {
 			light: 'Svetlá',
 			dark: 'Tmavá',
 			system: 'Systémová'
-		},
-		keys: {
-			keyRegistry: 'Register kľúčov',
-			welcome: 'Vitajte v Registri kľúčov. Tu nájdete všetky typy kľúčov pre naše služby.',
-			keyTypes: 'Typy kľúčov',
-			keyTypeRegistry: 'Register kľúčov {key}',
-			welcomeTypeRegistry: 'Register pre kľúče {key}. Tu nájdete všetky kľúče používané v našich službách.',
-			keyTypeInfo: 'Typy kľúčov',
-			publicKeyFor: 'Verejný kľúč pre {keyName}',
-			keyId: 'ID kľúča: {keyId}',
-			copyKey: 'Kopírovať kľúč',
-			downloadKey: 'Stiahnuť {keyName}',
-			viewOnKeyServer: 'Zobraziť na serveri kľúčov'
 		}
 	},
 
 	helpers: {
-		keys: {
-			copiedToClipboard: 'Kľúč bol skopírovaný do schránky',
-			failedToCopy: 'Nepodarilo sa skopírovať kľúč'
-		},
 		coreIdValidation: {
 			error: 'Zadajte platné Core ID',
 			enterpriseError: 'Adresy podnikovej siete nie je možné použiť na platby',
