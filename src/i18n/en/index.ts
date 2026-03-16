@@ -64,7 +64,6 @@ const en: BaseTranslation = {
 		applications: 'Applications',
 		developers: 'Developers',
 		contact: 'Contact',
-		allianceMember: 'PayTo Alliance Member',
 		termsOfService: 'Terms of Service',
 		privacyPolicy: 'Privacy Policy',
 		keyRegistry: 'Key Registry',
