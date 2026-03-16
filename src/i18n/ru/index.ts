@@ -67,7 +67,6 @@ const ruPartial: DeepPartial<Translation> = {
 		applications: 'Приложения',
 		developers: 'Разработчикам',
 		contact: 'Контакты',
-		allianceMember: 'Член PayTo альянса',
 		termsOfService: 'Условия обслуживания',
 		privacyPolicy: 'Политика конфиденциальности',
 		keyRegistry: 'Реестр ключей',

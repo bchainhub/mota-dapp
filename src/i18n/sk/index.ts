@@ -67,7 +67,6 @@ const skPartial: DeepPartial<Translation> = {
 		applications: 'Aplikácie',
 		developers: 'Vývojári',
 		contact: 'Kontakt',
-		allianceMember: 'Člen PayTo aliancie',
 		termsOfService: 'Podmienky používania',
 		privacyPolicy: 'Zásady ochrany súkromia',
 		keyRegistry: 'Register kľúčov',
