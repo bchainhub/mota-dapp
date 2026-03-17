@@ -7,8 +7,7 @@
 	import { asDynamicIcon } from '$lib/helpers/icon';
 	// @ts-ignore - LL might not be available if i18n library not installed
 	import { LL, locale as localeStore } from '$lang/i18n-svelte';
-	import { t, getAvailableLocales, applyLocale } from '$lib/helpers/i18n';
-	import { getLocaleDisplay } from '$lang/locale-display';
+	import { t, getAvailableLocalesWithNamesAsync, applyLocale } from '$lib/helpers/i18n';
 	import { walletAddress, walletType, autoLogin, shouldAutoConnect, initPostInstallWalletAction, isCoreEcosystem } from '$modules/auth/web3';
 	import type { ShortFormatKind } from '$lib/helpers/shortFormat';
 	import { goto } from '$app/navigation';
@@ -76,7 +75,7 @@
 	let initialLoad = $state(true);
 
 	// Language submenu state (use i18n store so selection persists across navigations)
-	let availableLocales: Array<{ code: string; name: string }> = $state([]);
+	let availableLocales: Array<{ code: string; name: string; icon?: string }> = $state([]);
 	const currentLocale = $derived(
 		$localeStore ?? (page.data as { locale?: string }).locale ?? (_cfg?.language as { defaultLocale?: string } | undefined)?.defaultLocale ?? 'en'
 	);
@@ -271,8 +270,8 @@
 	};
 
 	onMount(() => {
-		// Initialize language settings (names/icons from each locale's language.descriptiveName in i18n)
-		availableLocales = getAvailableLocales().map((code) => ({ code, ...getLocaleDisplay(code) }));
+		// Initialize language settings (names/icons from locale files when config.availableLocales is string[])
+		getAvailableLocalesWithNamesAsync().then((list) => { availableLocales = list; });
 
 		let autoConnectTimeout: ReturnType<typeof setTimeout> | undefined;
 		if (authEnabled && browser && web3Enabled && autoConnectEnabled && shouldAutoConnect()) {
