@@ -56,19 +56,17 @@
 		// Use i18n helper to apply locale (updates locale store; UI follows)
 		await applyLocale(locale);
 
-		// Update URL
+		// Update URL: only the first path segment is the locale (strict). Strip it iff it equals current locale, then add new one.
+		// BCP 47–style: language 2–3 letters, optional -region (2–8 alphanumeric), e.g. en, pt-br, zh-cn.
 		const currentPath = page.url.pathname;
-		let newPath: string = currentPath;
-
-		// Remove current locale from path if it exists
-		const pathHasLocale = currentPath.match(/^\/[a-z]{2}(?:\/|$)/);
-		if (pathHasLocale) {
-			newPath = currentPath.replace(/^\/[a-z]{2}/, '') || '/';
-		}
-
-		// Add new locale to path if it's not the default
+		const firstSegmentMatch = currentPath.match(/^\/([a-z]{2,3}(-[a-z0-9]{2,8})*)(?=\/|$)/);
+		const firstSegmentIsCurrentLocale = firstSegmentMatch && firstSegmentMatch[1] === actualCurrentLocale;
+		let newPath =
+			firstSegmentIsCurrentLocale
+				? (currentPath.replace(new RegExp(`^/${actualCurrentLocale.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`), '') || '/')
+				: currentPath;
 		if (locale !== defaultLocale) {
-			newPath = `/${locale}${newPath}`;
+			newPath = newPath === '/' ? `/${locale}` : `/${locale}${newPath}`;
 		}
 
 		// Navigate to new path

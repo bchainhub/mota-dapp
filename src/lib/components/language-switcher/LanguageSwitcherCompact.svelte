@@ -2,8 +2,11 @@
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 	import { Icon } from '$components';
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { getLocale, applyLocale } from '$lib/helpers/i18n';
+	import { getSiteConfig } from '$lib/helpers/siteConfig';
 	import { locale as localeStore } from '$lang/i18n-svelte';
 
 	let {
@@ -72,8 +75,25 @@
 	};
 
 	const selectItem = async (item: any) => {
+		const previousLocale = effectiveLocale ?? getLocale();
+		const newLocale = item.id;
+		const defaultLocale = (getSiteConfig()?.language as { defaultLocale?: string } | undefined)?.defaultLocale ?? 'en';
+
 		// Apply locale using i18n helper (locale store updates; UI follows)
-		await applyLocale(item.id);
+		await applyLocale(newLocale);
+
+		// Update URL: only the first path segment is the locale (strict). Strip it iff it equals previous locale, then add new one.
+		const currentPath = page.url.pathname;
+		const firstSegmentMatch = currentPath.match(/^\/([a-z]{2,3}(-[a-z0-9]{2,8})*)(?=\/|$)/);
+		const firstSegmentIsPreviousLocale = firstSegmentMatch && firstSegmentMatch[1] === previousLocale;
+		let newPath =
+			firstSegmentIsPreviousLocale
+				? (currentPath.replace(new RegExp(`^/${previousLocale.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`), '') || '/')
+				: currentPath;
+		if (newLocale !== defaultLocale) {
+			newPath = newPath === '/' ? `/${newLocale}` : `/${newLocale}${newPath}`;
+		}
+		await goto(newPath as any, { replaceState: true });
 
 		onselect?.(item);
 		slideDirection = 'exit';

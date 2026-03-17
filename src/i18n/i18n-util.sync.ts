@@ -8,13 +8,9 @@ const initFormatters = createStubFormatters<Locales, Formatters>();
 import { loadedFormatters, loadedLocales, locales } from './i18n-util'
 
 import en from './en'
-import ru from './ru'
-import sk from './sk'
 
 const localeTranslations = {
-	en,
-	ru,
-	sk,
+	en
 }
 
 export const loadLocale = (locale: Locales): void => {

@@ -8,9 +8,7 @@ const initFormatters = createStubFormatters<Locales, Formatters>();
 import { loadedFormatters, loadedLocales, locales } from './i18n-util'
 
 const localeTranslationLoaders = {
-	en: () => import('./en'),
-	ru: () => import('./ru'),
-	sk: () => import('./sk'),
+	en: () => import('./en')
 }
 
 const updateDictionary = (locale: Locales, dictionary: Partial<Translations>): Translations =>
