@@ -75,15 +75,13 @@
 	};
 
 	const selectItem = async (item: any) => {
+		// Capture previous locale and path before applyLocale; after applyLocale the store is already the new locale.
 		const previousLocale = effectiveLocale ?? getLocale();
 		const newLocale = item.id;
 		const defaultLocale = (getSiteConfig()?.language as { defaultLocale?: string } | undefined)?.defaultLocale ?? 'en';
-
-		// Apply locale using i18n helper (locale store updates; UI follows)
-		await applyLocale(newLocale);
-
-		// Update URL: only the first path segment is the locale (strict). Strip it iff it equals previous locale, then add new one.
 		const currentPath = page.url.pathname;
+
+		// Update URL: only the first path segment is the locale (strict). Strip it iff it equals *previous* locale, then add new one.
 		const firstSegmentMatch = currentPath.match(/^\/([a-z]{2,3}(-[a-z0-9]{2,8})*)(?=\/|$)/);
 		const firstSegmentIsPreviousLocale = firstSegmentMatch && firstSegmentMatch[1] === previousLocale;
 		let newPath =
@@ -93,6 +91,9 @@
 		if (newLocale !== defaultLocale) {
 			newPath = newPath === '/' ? `/${newLocale}` : `/${newLocale}${newPath}`;
 		}
+
+		// Apply locale (updates store; UI follows) then navigate so URL matches
+		await applyLocale(newLocale);
 		await goto(newPath as any, { replaceState: true });
 
 		onselect?.(item);

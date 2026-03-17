@@ -53,17 +53,20 @@
 	async function changeLanguage(locale: string) {
 		if (locale === actualCurrentLocale) return;
 
+		// Capture previous locale before applying; after applyLocale the store is already the new locale.
+		const previousLocale = actualCurrentLocale;
+
 		// Use i18n helper to apply locale (updates locale store; UI follows)
 		await applyLocale(locale);
 
-		// Update URL: only the first path segment is the locale (strict). Strip it iff it equals current locale, then add new one.
+		// Update URL: only the first path segment is the locale (strict). Strip it iff it equals *previous* locale, then add new one.
 		// BCP 47–style: language 2–3 letters, optional -region (2–8 alphanumeric), e.g. en, pt-br, zh-cn.
 		const currentPath = page.url.pathname;
 		const firstSegmentMatch = currentPath.match(/^\/([a-z]{2,3}(-[a-z0-9]{2,8})*)(?=\/|$)/);
-		const firstSegmentIsCurrentLocale = firstSegmentMatch && firstSegmentMatch[1] === actualCurrentLocale;
+		const firstSegmentIsPreviousLocale = firstSegmentMatch && firstSegmentMatch[1] === previousLocale;
 		let newPath =
-			firstSegmentIsCurrentLocale
-				? (currentPath.replace(new RegExp(`^/${actualCurrentLocale.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`), '') || '/')
+			firstSegmentIsPreviousLocale
+				? (currentPath.replace(new RegExp(`^/${previousLocale.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`), '') || '/')
 				: currentPath;
 		if (locale !== defaultLocale) {
 			newPath = newPath === '/' ? `/${locale}` : `/${locale}${newPath}`;
