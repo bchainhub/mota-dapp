@@ -15,18 +15,21 @@
 		items = [],
 		onback,
 		onselect,
-		iconExternal = true
+		iconExternal = true,
+		className = ''
 	}: {
 		title?: string;
 		icon?: string;
 		items?: Array<{
 			id: string;
 			label: string;
+			icon?: string;
 			active?: boolean;
 		}>;
 		onback?: () => void;
 		onselect?: (item: any) => void;
 		iconExternal?: boolean;
+		className?: string;
 	} = $props();
 
 	let showSubmenu = $state(false);
@@ -118,7 +121,7 @@
 <!-- Language Button -->
 <button
 	onclick={toggleSubmenu}
-	class="flex items-center justify-between w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8"
+	class="flex items-center justify-between w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8 {className}"
 >
 	<div class="w-5"></div> <!-- Left spacer to balance the chevron -->
 	<div class="flex items-center justify-center flex-1">
@@ -156,7 +159,10 @@
 									onclick={(e) => { e.stopPropagation(); selectItem(item); }}
 									class="flex items-center justify-center w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8 {item.active ? 'text-indigo-400' : ''}"
 								>
-									<div class="flex items-center">
+									<div class="flex items-center gap-2">
+										{#if item.icon}
+											<span class="text-lg leading-none" aria-hidden="true">{item.icon}</span>
+										{/if}
 										<span>{item.label}</span>
 									</div>
 								</button>

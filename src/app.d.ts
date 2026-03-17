@@ -532,9 +532,9 @@ declare module 'vite-plugin-config' {
 			showName?: boolean;
 			/**
 			 * availableLocales
-			 * @description List of locales: { code, name? } (e.g. { code: 'en', name: 'English' }).
+			 * @description Locale codes (e.g. ['en', 'es', 'pt-br']). Names come from each locale's language.descriptiveName in src/i18n.
 			 */
-			availableLocales?: Array<{ code: string; name?: string }>;
+			availableLocales?: string[] | Array<{ code: string; name?: string }>;
 			/**
 			 * defaultLocale
 			 * @description Default locale code when none is detected or selected (e.g. 'en').
@@ -546,8 +546,13 @@ declare module 'vite-plugin-config' {
 			 */
 			autoDetect?: boolean;
 			/**
+			 * addIcons
+			 * @description When true, show flag/icon before language name in switcher (normal and compact). Default false.
+			 */
+			addIcons?: boolean;
+			/**
 			 * className
-			 * @description Optional CSS class for the language switcher container.
+			 * @description Optional CSS class for the language switcher container (normal and compact).
 			 */
 			className?: string;
 		};

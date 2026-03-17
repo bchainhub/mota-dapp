@@ -3,7 +3,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import type { LayoutData } from './$types';
-	import { applyLocale, detectLocale } from '$lib/helpers/i18n';
+	import { applyLocale, detectLocale, getAvailableLocales } from '$lib/helpers/i18n';
 	import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
 	import { getSiteConfig } from '$lib/helpers/siteConfig';
 	import type { Config } from 'vite-plugin-config';
@@ -22,10 +22,10 @@
 	// Apply locale: URL wins over stored (mota.locale), then stored, then auto-detect, then default
 	$: if (enabled && browser) {
 		const storedLocale = getStoredLocale();
+		const localeCodes = getAvailableLocales();
 		const urlLocaleValid =
-			(data as { fromUrl?: boolean; locale?: string }).fromUrl && language?.availableLocales?.some((loc) => loc.code === data.locale);
-		const storedValid =
-			storedLocale && language?.availableLocales?.some((loc) => loc.code === storedLocale);
+			(data as { fromUrl?: boolean; locale?: string }).fromUrl && data.locale && localeCodes.includes(data.locale);
+		const storedValid = storedLocale && localeCodes.includes(storedLocale);
 
 		// Priority 1: URL locale (e.g. /ru) — use it and persist so next visit follows it unless URL says otherwise
 		if (urlLocaleValid) {
@@ -42,10 +42,10 @@
 		}
 		// Priority 3: Auto-detect
 		else if (language?.autoDetect) {
-			detectLocale(navigator.language, language.availableLocales?.map((loc) => loc.code) ?? [])
+			detectLocale(navigator.language, localeCodes)
 				.then(detectedLocale => {
 					const finalLocale =
-						detectedLocale && language?.availableLocales?.some((loc) => loc.code === detectedLocale)
+						detectedLocale && localeCodes.includes(detectedLocale)
 							? detectedLocale
 							: language?.defaultLocale || 'en';
 					setStoredLocale(finalLocale);

@@ -7,7 +7,8 @@
 	import { asDynamicIcon } from '$lib/helpers/icon';
 	// @ts-ignore - LL might not be available if i18n library not installed
 	import { LL, locale as localeStore } from '$lang/i18n-svelte';
-	import { t, getAvailableLocalesWithNames, applyLocale } from '$lib/helpers/i18n';
+	import { t, getAvailableLocales, applyLocale } from '$lib/helpers/i18n';
+	import { getLocaleDisplay } from '$lang/locale-display';
 	import { walletAddress, walletType, autoLogin, shouldAutoConnect, initPostInstallWalletAction, isCoreEcosystem } from '$modules/auth/web3';
 	import type { ShortFormatKind } from '$lib/helpers/shortFormat';
 	import { goto } from '$app/navigation';
@@ -270,8 +271,8 @@
 	};
 
 	onMount(() => {
-		// Initialize language settings
-		availableLocales = getAvailableLocalesWithNames();
+		// Initialize language settings (names/icons from each locale's language.descriptiveName in i18n)
+		availableLocales = getAvailableLocales().map((code) => ({ code, ...getLocaleDisplay(code) }));
 
 		let autoConnectTimeout: ReturnType<typeof setTimeout> | undefined;
 		if (authEnabled && browser && web3Enabled && autoConnectEnabled && shouldAutoConnect()) {
@@ -593,10 +594,8 @@
 						<div class="{orientation === 'vertical' ? 'w-full flex justify-center' : ''}">
 							<LanguageSwitcher
 								currentLocale={$localeStore ?? page.data.locale ?? (_cfg?.language as { defaultLocale?: string })?.defaultLocale ?? 'en'}
-								availableLocales={((_cfg?.language as { availableLocales?: Array<{ code: string; name?: string }> })?.availableLocales || [{ code: 'en', name: 'English' }]).map((locale: { code: string; name?: string }) => ({
-									code: locale.code,
-									name: locale.name || locale.code.toUpperCase()
-								}))}
+								availableLocales={availableLocales}
+								addIcons={(_cfg?.language as { addIcons?: boolean })?.addIcons ?? false}
 								defaultLocale={(_cfg?.language as { defaultLocale?: string })?.defaultLocale || 'en'}
 								className={(_cfg?.language as { className?: string })?.className || ''}
 								{orientation}
@@ -767,13 +766,15 @@
 								<LanguageSwitcherCompact
 									title={getCurrentLanguageName()}
 									icon={(_cfg?.language as { icon?: string })?.icon || 'languages'}
-									items={availableLocales.map(locale => ({
+									items={availableLocales.map((locale) => ({
 										id: locale.code,
 										label: locale.name,
+										icon: (_cfg?.language as { addIcons?: boolean })?.addIcons ? locale.icon : undefined,
 										active: locale.code === currentLocale
 									}))}
 									onback={() => {}}
 									onselect={(item: { id: string }) => selectLanguage(item.id)}
+									className={(_cfg?.language as { className?: string })?.className ?? ''}
 								/>
 							</li>
 						{/if}

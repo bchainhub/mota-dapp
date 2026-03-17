@@ -81,27 +81,30 @@ export const detectLocale = async (navigatorLanguage: string, availableLocales: 
 	return fallbackDetectLocale(navigatorLanguage, availableLocales);
 };
 
-// get available locales from config
+// get available locales from config (supports string[] or Array<{ code: string }>)
 export const getAvailableLocales = (): string[] => {
 	if (!config?.enabled) return ['en'];
-	const locales = config?.availableLocales;
-	return locales ? locales.map(locale => locale.code) : ['en'];
+	const locales = config?.availableLocales as string[] | Array<{ code: string }> | undefined;
+	if (!locales?.length) return ['en'];
+	return typeof locales[0] === 'string'
+		? (locales as string[])
+		: (locales as Array<{ code: string }>).map((loc) => loc.code);
 };
 
-// get available locales with names from config
-export const getAvailableLocalesWithNames = (): Array<{ code: string; name: string }> => {
-	if (!config?.enabled) {
-		return [{ code: 'en', name: 'English' }];
-	}
-	const locales = config?.availableLocales;
-	if (!locales) {
-		return [{ code: 'en', name: 'English' }];
-	}
-
-	return locales.map(locale => ({
-		code: locale.code,
-		name: locale.name || locale.code.toUpperCase()
-	}));
+// get available locales with names; when config.availableLocales is string[], names come from caller via getLocaleDisplay ($lang/locale-display)
+export const getAvailableLocalesWithNames = (): Array<{ code: string; name: string; icon?: string }> => {
+	if (!config?.enabled) return [{ code: 'en', name: 'English' }];
+	const locales = config?.availableLocales as string[] | Array<{ code: string; name?: string }> | undefined;
+	if (!locales?.length) return [{ code: 'en', name: 'English' }];
+	const codes = typeof locales[0] === 'string' ? (locales as string[]) : (locales as Array<{ code: string }>).map((l) => l.code);
+	// When config is string[], caller should use getLocaleDisplay for names; we return code as name
+	const withNames = typeof locales[0] === 'string'
+		? (codes as string[]).map((code) => ({ code, name: code }))
+		: (locales as Array<{ code: string; name?: string }>).map((loc) => ({
+				code: loc.code,
+				name: loc.name ?? loc.code
+		  }));
+	return withNames;
 };
 
 // get the current locale
