@@ -2,7 +2,7 @@
 /* eslint-disable */
 export type BaseTranslation = Record<string, unknown>;
 export type BaseLocale = 'en';
-export type Locales = 'en' | 'ru' | 'sk';
+export type Locales = 'en';
 export type Translation = BaseTranslation;
 export type Translations = BaseTranslation;
 export type Formatters = Record<string, unknown>;

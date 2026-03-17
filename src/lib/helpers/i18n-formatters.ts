@@ -15,3 +15,8 @@ export function createStubFormatters<L extends string, F extends Record<string, 
 > {
 	return (_locale: L): F => ({} as F);
 }
+
+/** Stub used by i18n-util.async and i18n-util.sync when formatters are in helpers. Replace with locale-specific formatters if needed. */
+export function initFormatters(_locale: string): Record<string, unknown> {
+	return {};
+}
