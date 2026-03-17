@@ -13,8 +13,13 @@ const languageConfig = {
 	showName: false,
 	availableLocales: [
 		{ code: 'en', name: 'English' },
+		{ code: 'es', name: 'Español' },
+		{ code: 'ja', name: '日本語' },
+		{ code: 'pt-br', name: 'Português (BR)' },
 		{ code: 'ru', name: 'Русский' },
-		{ code: 'sk', name: 'Slovenčina' }
+		{ code: 'sk', name: 'Slovenčina' },
+		{ code: 'th', name: 'ไทย' },
+		{ code: 'zh-cn', name: '简体中文' }
 	],
 	defaultLocale: 'en',
 	autoDetect: true

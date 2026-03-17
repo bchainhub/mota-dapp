@@ -22,6 +22,14 @@
 	label:not(:disabled) {
 		cursor: pointer;
 	}
+
+	a {
+		@apply text-blue-500 transition-colors duration-300 ease-in-out;
+	}
+
+	a:hover {
+		@apply text-blue-700 underline;
+	}
 }
 
 @layer components {
@@ -79,14 +87,6 @@ body {
 
 .view {
 	flex: 1;
-}
-
-a {
-	@apply text-blue-500 transition-colors duration-300 ease-in-out;
-}
-
-a:hover {
-	@apply text-blue-700 underline;
 }
 
 header {
