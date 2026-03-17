@@ -6,21 +6,12 @@ import tailwindcss from '@tailwindcss/vite';
 import { resolveExtensionlessPlugin } from './src/lib/helpers/vite-resolve-extensionless';
 declare const process: { env: Record<string, string | undefined> };
 
-// Language configuration
+// Language configuration: availableLocales as locale codes; names are read from each locale's language.descriptiveName in src/i18n
 const languageConfig = {
 	enabled: false,
 	icon: 'languages',
 	showName: false,
-	availableLocales: [
-		{ code: 'en', name: 'English' },
-		{ code: 'es', name: 'Español' },
-		{ code: 'ja', name: '日本語' },
-		{ code: 'pt-br', name: 'Português (BR)' },
-		{ code: 'ru', name: 'Русский' },
-		{ code: 'sk', name: 'Slovenčina' },
-		{ code: 'th', name: 'ไทย' },
-		{ code: 'zh-cn', name: '简体中文' }
-	],
+	availableLocales: ['en'],
 	defaultLocale: 'en',
 	autoDetect: true
 };

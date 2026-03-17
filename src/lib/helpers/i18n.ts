@@ -81,28 +81,82 @@ export const detectLocale = async (navigatorLanguage: string, availableLocales: 
 	return fallbackDetectLocale(navigatorLanguage, availableLocales);
 };
 
-// get available locales from config
+// get available locales from config (supports string[] or Array<{ code: string }>)
 export const getAvailableLocales = (): string[] => {
 	if (!config?.enabled) return ['en'];
-	const locales = config?.availableLocales;
-	return locales ? locales.map(locale => locale.code) : ['en'];
+	const locales = config?.availableLocales as string[] | Array<{ code: string }> | undefined;
+	if (!locales?.length) return ['en'];
+	return typeof locales[0] === 'string'
+		? (locales as string[])
+		: (locales as Array<{ code: string }>).map((loc) => loc.code);
 };
 
-// get available locales with names from config
-export const getAvailableLocalesWithNames = (): Array<{ code: string; name: string }> => {
-	if (!config?.enabled) {
-		return [{ code: 'en', name: 'English' }];
-	}
-	const locales = config?.availableLocales;
-	if (!locales) {
-		return [{ code: 'en', name: 'English' }];
-	}
-
-	return locales.map(locale => ({
-		code: locale.code,
-		name: locale.name || locale.code.toUpperCase()
-	}));
+// get available locales with names; when config.availableLocales is string[], names come from locale files via getLocaleDisplay
+export const getAvailableLocalesWithNames = (): Array<{ code: string; name: string; icon?: string }> => {
+	if (!config?.enabled) return [{ code: 'en', name: 'English' }];
+	const locales = config?.availableLocales as string[] | Array<{ code: string; name?: string; icon?: string }> | undefined;
+	if (!locales?.length) return [{ code: 'en', name: 'English' }];
+	const codes = typeof locales[0] === 'string' ? (locales as string[]) : (locales as Array<{ code: string }>).map((l) => l.code);
+	const withNames = typeof locales[0] === 'string'
+		? (codes as string[]).map((code) => ({ code, name: code }))
+		: (locales as Array<{ code: string; name?: string; icon?: string }>).map((loc) => ({
+				code: loc.code,
+				name: loc.name ?? loc.code,
+				icon: loc.icon
+		  }));
+	return withNames;
 };
+
+// Locale display (name/icon from each locale's language.descriptiveName in src/i18n). Uses dynamic import to avoid circular deps.
+type LocaleDisplay = { name: string; icon?: string };
+const localeDisplayCache: Record<string, LocaleDisplay> = {};
+const localeModules = import.meta.glob<{ default: { language?: { descriptiveName?: string; name?: string; icon?: string } } }>(
+	'../../i18n/*/index.ts'
+);
+
+export async function getLocaleDisplayAsync(code: string): Promise<LocaleDisplay> {
+	if (localeDisplayCache[code]) return localeDisplayCache[code];
+	const key = `../../i18n/${code}/index.ts`;
+	const loader = localeModules[key];
+	if (!loader) {
+		localeDisplayCache[code] = { name: code };
+		return localeDisplayCache[code];
+	}
+	try {
+		const mod = await loader();
+		const d = mod?.default;
+		localeDisplayCache[code] = {
+			name: d?.language?.descriptiveName ?? d?.language?.name ?? code,
+			icon: d?.language?.icon
+		};
+		return localeDisplayCache[code];
+	} catch {
+		localeDisplayCache[code] = { name: code };
+		return localeDisplayCache[code];
+	}
+}
+
+/** Sync fallback when locale was already loaded; otherwise returns code as name. Use getLocaleDisplayAsync for names from translation files. */
+export function getLocaleDisplay(code: string): LocaleDisplay {
+	return localeDisplayCache[code] ?? { name: code };
+}
+
+/** When config.availableLocales is string[], use this in onMount to get names/icons from locale files. */
+export async function getAvailableLocalesWithNamesAsync(): Promise<Array<{ code: string; name: string; icon?: string }>> {
+	const locales = config?.availableLocales as string[] | Array<{ code: string; name?: string; icon?: string }> | undefined;
+	if (!config?.enabled || !locales?.length) return [{ code: 'en', name: 'English' }];
+	const codes = typeof locales[0] === 'string' ? (locales as string[]) : (locales as Array<{ code: string }>).map((l) => l.code);
+	if (typeof locales[0] !== 'string') {
+		return (locales as Array<{ code: string; name?: string; icon?: string }>).map((loc) => ({
+			code: loc.code,
+			name: loc.name ?? loc.code,
+			icon: loc.icon
+		}));
+	}
+	return Promise.all(
+		(codes as string[]).map(async (code) => ({ code, ...(await getLocaleDisplayAsync(code)) }))
+	);
+}
 
 // get the current locale
 export const getLocale = (): string => {

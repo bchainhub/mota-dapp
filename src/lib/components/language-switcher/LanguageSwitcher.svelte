@@ -14,13 +14,15 @@
 		currentLocale = 'en',
 		availableLocales = [{ code: 'en', name: 'English' }],
 		defaultLocale = 'en',
+		addIcons = false,
 		className = '',
 		orientation = 'horizontal',
 		theme = 'blur'
 	}: {
 		currentLocale?: string;
-		availableLocales?: Array<{ code: string; name: string }>;
+		availableLocales?: Array<{ code: string; name: string; icon?: string }>;
 		defaultLocale?: string;
+		addIcons?: boolean;
 		className?: string;
 		orientation?: 'horizontal' | 'vertical';
 		theme?: 'auto' | 'blur' | 'transparent';
@@ -130,11 +132,16 @@
 					{#each sortedLocales as locale}
 						<button
 							onclick={() => changeLanguage(locale.code)}
-							class="w-full px-4 py-2 text-left text-slate-300 hover:bg-slate-700 transition-colors duration-200 flex items-center justify-between {locale.code === actualCurrentLocale ? 'bg-slate-700 font-medium' : ''}"
+							class="w-full px-4 py-2 text-left text-slate-300 hover:bg-slate-700 transition-colors duration-200 flex items-center justify-between gap-2 {locale.code === actualCurrentLocale ? 'bg-slate-700 font-medium' : ''}"
 						>
-							<span>{locale.name}</span>
+							<span class="flex items-center gap-2">
+								{#if addIcons && locale.icon}
+									<span class="text-lg leading-none" aria-hidden="true">{locale.icon}</span>
+								{/if}
+								{locale.name}
+							</span>
 							{#if locale.code === actualCurrentLocale}
-								<div class="w-2 h-2 bg-indigo-500 rounded-full"></div>
+								<div class="w-2 h-2 bg-indigo-500 rounded-full shrink-0"></div>
 							{/if}
 						</button>
 					{/each}

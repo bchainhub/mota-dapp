@@ -1,6 +1,15 @@
 import type { BaseTranslation } from '../i18n-types'
 
 const en: BaseTranslation = {
+	language: {
+		name: 'English',
+		fullName: 'English - International',
+		descriptiveName: 'English (Int)',
+		code: 'en',
+		icon: '🇺🇸',
+		rtl: false
+	},
+
 	site: {
 		description: 'MOTA',
 		keywords: 'mota, sveltekit, dapp, blockchain, moneyx, paypass, ican, payto, oric, corepass, txms'
