@@ -24,7 +24,12 @@ function createKeyProxy(prefix = ''): unknown {
 
 export const locale = writable<string>('en');
 export const LL = writable<Record<string, unknown>>(createKeyProxy() as Record<string, unknown>);
-export const setLocale = (_l: string): void => { /* no-op; override when using typesafe-i18n */ };
+
+/** When language enabled: updates locale store. When disabled: no-op. When enabled, LL store is set in applyLocale after loading typesafe-i18n. */
+function setLocaleDefault(l: string): void {
+	if (config?.enabled) locale.set(l);
+}
+export const setLocale = setLocaleDefault;
 
 // -----------------------------
 // Locale types
@@ -222,20 +227,37 @@ export const getLocale = (): string => {
 };
 
 // set the active locale for $LL (and persist in localStorage on browser)
-// - Ensures base + active dictionaries are loaded on the client before switching
-export const applyLocale = async (locale: string) => {
+// - When enabled: loads typesafe-i18n locale, updates locale + LL stores so t() returns translations
+// - When disabled: no-op
+export const applyLocale = async (localeToApply: string) => {
 	if (!config?.enabled) return;
 
-	if (browser) {
-		setStoredLocale(locale);
+	if (browser) setStoredLocale(localeToApply);
+	setLocale(localeToApply);
+
+	if (!browser) return;
+	try {
+		const util = await import('../../i18n/i18n-util');
+		const utilAsync = await import('../../i18n/i18n-util.async');
+		if (util.isLocale(localeToApply)) {
+			await utilAsync.loadLocaleAsync(localeToApply);
+			LL.set(util.i18nObject(localeToApply) as unknown as Record<string, unknown>);
+		}
+	} catch {
+		// typesafe-i18n or i18n folder not present; LL stays as proxy, t() returns keys
 	}
-	setLocale(locale);
 };
 
 // preload a locale dictionary into memory (used by layout load)
-export const loadLocaleAsync = async (_locale: string) => {
+export const loadLocaleAsync = async (localeToLoad: string) => {
 	if (!config?.enabled) return;
-	// No external i18n; override when using typesafe-i18n
+	try {
+		const util = await import('../../i18n/i18n-util');
+		const utilAsync = await import('../../i18n/i18n-util.async');
+		if (util.isLocale(localeToLoad)) await utilAsync.loadLocaleAsync(localeToLoad);
+	} catch {
+		// typesafe-i18n or i18n folder not present
+	}
 };
 
 // Layout load function for i18n
