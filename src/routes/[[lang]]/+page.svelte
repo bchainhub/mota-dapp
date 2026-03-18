@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Brain, Bot, Code, Plug, Scroll } from 'lucide-svelte';
+	import { Brain, Bot, BookSearch, Box, Code, Plug, Scroll } from 'lucide-svelte';
 </script>
 
 <div class="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 py-16">
@@ -64,9 +64,18 @@
 				<Plug class="h-5 w-5" />
 			</div>
 			<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Plugin system</h3>
-			<p class="text-gray-600 dark:text-gray-400 text-sm">
+			<p class="text-gray-600 dark:text-gray-400 text-sm mb-3">
 				Install addons with <code class="rounded bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-gray-100 px-1.5 py-0.5 text-sm font-code">npx addon &lt;repo&gt; &lt;generator&gt; &lt;action&gt;</code>. Hygen-based generators add auth, features, or config without forking.
 			</p>
+			<a
+				href="https://github.com/topics/mota-addon"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 no-underline hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+			>
+				<Box class="h-4 w-4 shrink-0" />
+				Search for Addons
+			</a>
 		</div>
 	</div>
 </section>
@@ -99,9 +108,18 @@
 				<Bot class="h-5 w-5" />
 			</div>
 			<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">AI toolkit</h3>
-			<p class="text-gray-600 dark:text-gray-400 text-sm">
+			<p class="text-gray-600 dark:text-gray-400 text-sm mb-3">
 				AI support is via <strong>skills</strong>. Pick your agent (Copilot, Cursor, Continue) and add skill packs so assistants know your stack and conventions.
 			</p>
+			<a
+				href="https://github.com/topics/mota-skills"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 no-underline hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+			>
+				<BookSearch class="h-4 w-4 shrink-0" />
+				Search for skills
+			</a>
 		</div>
 	</div>
 </section>
@@ -116,6 +134,6 @@
 		<p class="text-gray-600 dark:text-gray-400 text-sm mt-4">
 			Then install addons (e.g. Passkey, Support, Banking, Minting) with:
 		</p>
-		<pre class="overflow-x-auto rounded-lg bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 p-4 text-sm mt-2"><code>npx addon bchainhub@mota-support support install</code></pre>
+		<pre class="overflow-x-auto rounded-lg bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 p-4 text-sm mt-2"><code>npx addon bchainhub@mota-addon-support support install</code></pre>
 	</div>
 </section>
