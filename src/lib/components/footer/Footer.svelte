@@ -5,8 +5,7 @@
 	import { Icon, Tooltip } from '$components';
 	import { Key } from 'lucide-svelte';
 	import { asDynamicIcon } from '$lib/helpers/icon';
-	// @ts-ignore - LL might not be available if i18n library not installed
-	import { LL } from '$lang/i18n-svelte';
+	import { LL } from '$lib/helpers/i18n';
 	import { t } from '$lib/helpers/i18n';
 	import { walletAddress } from '$modules/auth/web3';
 	import {

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	// @ts-ignore - LL might not be available if i18n library not installed
-	import { LL } from '$lang/i18n-svelte';
+	import { LL } from '$lib/helpers/i18n';
 	import { t } from '$lib/helpers/i18n';
 
 	const {

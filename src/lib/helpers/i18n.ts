@@ -1,8 +1,30 @@
 import { browser } from '$app/environment';
+import { writable } from 'svelte/store';
 import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
 import { getSiteConfig } from '$lib/helpers/siteConfig';
 
 const config = getSiteConfig()?.language;
+
+// -----------------------------
+// locale / LL / setLocale (all in helper; when language disabled = print key + defaults)
+// -----------------------------
+
+function createKeyProxy(prefix = ''): unknown {
+	return new Proxy(
+		() => prefix || '(key)',
+		{
+			get(_, key: string) {
+				if (key === 'then' || key === 'toJSON') return undefined;
+				const path = prefix ? `${prefix}.${key}` : key;
+				return createKeyProxy(path);
+			}
+		}
+	);
+}
+
+export const locale = writable<string>('en');
+export const LL = writable<Record<string, unknown>>(createKeyProxy() as Record<string, unknown>);
+export const setLocale = (_l: string): void => { /* no-op; override when using typesafe-i18n */ };
 
 // -----------------------------
 // Locale types
@@ -173,31 +195,15 @@ export const applyLocale = async (locale: string) => {
 	if (!config?.enabled) return;
 
 	if (browser) {
-		try {
-			// Try to load the async i18n utilities if they exist
-			// @ts-ignore - i18n-util.async may not exist if translations are not set up
-			const { loadLocaleAsync } = await import('$lang/i18n-util.async');
-			await loadLocaleAsync(locale as any);
-		} catch (error) {
-			// If i18n-util.async doesn't exist, we're not using translations
-		}
 		setStoredLocale(locale);
 	}
-
-	const { setLocale: i18nSetLocale } = await import('$lang/i18n-svelte');
-	i18nSetLocale(locale as any);
+	setLocale(locale);
 };
 
 // preload a locale dictionary into memory (used by layout load)
-export const loadLocaleAsync = async (locale: string) => {
+export const loadLocaleAsync = async (_locale: string) => {
 	if (!config?.enabled) return;
-	try {
-		// @ts-ignore - i18n-util.async may not exist if translations are not set up
-		const { loadLocaleAsync } = await import('$lang/i18n-util.async');
-		await loadLocaleAsync(locale as any);
-	} catch (error) {
-		// If i18n-util.async doesn't exist, we're not using translations
-	}
+	// No external i18n; override when using typesafe-i18n
 };
 
 // Layout load function for i18n
@@ -221,11 +227,13 @@ export type Vars = Record<string, string | number | boolean | null | undefined>;
 
 /**
  * Resolve a dotted i18n key against $LL and (optionally) pass vars.
+ * - When language is disabled: returns the key (print content).
  * - If the resolved value is a function -> calls it with vars.
  * - If it's a string -> returns it (with optional {vars} interpolation).
  * - If not found -> returns the key as a fallback.
  */
 export function t(key: string, LL: Record<string, any>, vars?: Vars): string {
+	if (!config?.enabled) return key;
 	// navigate dotted path: 'footer.links.about' -> LL.footer.links.about
 	let cur: any = LL;
 	for (const part of key.split('.')) {
