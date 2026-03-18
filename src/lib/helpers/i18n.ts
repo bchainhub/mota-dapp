@@ -5,6 +5,9 @@ import { getSiteConfig } from '$lib/helpers/siteConfig';
 
 const config = getSiteConfig()?.language;
 
+/** Recursive type for LL: nested objects and/or functions returning string. Used when i18n-types (TranslationFunctions) is not available. */
+export type LLType = { [key: string]: LLType | ((...args: any[]) => string) };
+
 // -----------------------------
 // locale / LL / setLocale (all in helper; when language disabled = print key + defaults)
 // -----------------------------
@@ -23,7 +26,7 @@ function createKeyProxy(prefix = ''): unknown {
 }
 
 export const locale = writable<string>('en');
-export const LL = writable<Record<string, unknown>>(createKeyProxy() as Record<string, unknown>);
+export const LL = writable<LLType>(createKeyProxy() as LLType);
 
 /** When language enabled: updates locale store. When disabled: no-op. When enabled, LL store is set in applyLocale after loading typesafe-i18n. */
 function setLocaleDefault(l: string): void {
@@ -241,7 +244,7 @@ export const applyLocale = async (localeToApply: string) => {
 		const utilAsync = await import('../../i18n/i18n-util.async');
 		if (util.isLocale(localeToApply)) {
 			await utilAsync.loadLocaleAsync(localeToApply);
-			LL.set(util.i18nObject(localeToApply) as unknown as Record<string, unknown>);
+			LL.set(util.i18nObject(localeToApply) as unknown as LLType);
 		}
 	} catch {
 		// typesafe-i18n or i18n folder not present; LL stays as proxy, t() returns keys
