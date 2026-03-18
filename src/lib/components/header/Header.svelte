@@ -52,7 +52,7 @@
 		orientation = 'horizontal',
 		style = 'blur',
 		iconExternal,
-		leftItemsPosition = 'left',
+		itemsPosition = 'side',
 		hideOnScroll = false
 	} = navbarCfg?.navbar ?? {};
 	const { disableSwitch, defaultMode, respectPrefersColorScheme } =
@@ -66,6 +66,8 @@
 	let theme = $state(respectPrefersColorScheme
 		? 'system'
 		: (defaultMode ?? 'light'));
+	/** Resolved dark state for logo: true when user or system theme is dark (used for transparent/auto logo choice). */
+	let isResolvedDark = $state(false);
 
 	// Scroll hide functionality
 	let isScrollingDown = $state(false);
@@ -83,8 +85,19 @@
 	const handleSystemThemeChange = (e: MediaQueryListEvent) => {
 		if (theme === 'system') {
 			document.documentElement.classList.toggle('dark', e.matches);
+			isResolvedDark = e.matches;
 		}
 	};
+
+	/** Logo src: blur = always dark logo; transparent = dark when theme dark; auto = dark when navbar dark (user light). No srcDark → fallback to src. */
+	const logoSrc = $derived.by(() => {
+		if (!logo) return '';
+		const dark = logo.srcDark ?? logo.src;
+		if (style === 'blur') return dark;
+		if (style === 'transparent') return isResolvedDark ? dark : logo.src;
+		if (style === 'auto') return !isResolvedDark ? dark : logo.src; // light theme → dark navbar → dark logo
+		return logo.src;
+	});
 
 	const visibleItems = $derived(
 		filterNavItemsByAuth(items as import('$lib/helpers/nav').ItemWithShow[], showContext, authEnabled) as NavbarItem[]
@@ -258,11 +271,13 @@
 				// Apply system theme
 				const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 				document.documentElement.classList.toggle('dark', prefersDark);
+				isResolvedDark = prefersDark;
 				removeStoredTheme();
 			} else {
 				// Apply manual theme
 				const isDark = theme === 'dark';
 				document.documentElement.classList.toggle('dark', isDark);
+				isResolvedDark = isDark;
 				setStoredTheme(theme);
 			}
 		}
@@ -360,7 +375,7 @@
 			{#if logo}
 				<a href="/" class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'lg:mb-6' : ''}`}>
 					<img
-						src={style === 'auto' && theme === 'dark' && logo.srcDark ? logo.srcDark : style === 'transparent' && theme === 'light' && logo.srcDark ? logo.srcDark : logo.src}
+						src={logoSrc}
 						alt={logo.alt}
 						class="h-6"
 					/>
@@ -374,7 +389,7 @@
 			<!-- Desktop Navigation - Hidden on sm and md, visible on lg+ -->
 			<div class={`hidden lg:flex flex-1 mx-4 min-w-0 ${orientation === 'vertical' ? 'lg:flex-col' : 'scroll-smooth'} relative`}>
 			<div class="flex-1 min-w-0">
-					<ul class={`flex items-center ${orientation === 'vertical' ? 'gap-2 lg:flex-col lg:items-stretch w-full' : leftItemsPosition === 'center' ? 'gap-4 flex-wrap justify-center w-full' : 'gap-4 flex-wrap justify-start w-full'}`}>
+					<ul class={`flex items-center ${orientation === 'vertical' ? 'gap-2 lg:flex-col lg:items-stretch w-full' : itemsPosition === 'center' ? 'gap-4 flex-wrap justify-center w-full' : 'gap-4 flex-wrap justify-start w-full'}`}>
 						{#each visibleItemsWithActions as { label, to, href, target, rel, position, icon, className, submenu, action }}
 							{#if orientation === 'vertical' || position !== 'right'}
 								<li class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'w-full justify-start' : ''}`}>
