@@ -24,7 +24,12 @@ function createKeyProxy(prefix = ''): unknown {
 
 export const locale = writable<string>('en');
 export const LL = writable<Record<string, unknown>>(createKeyProxy() as Record<string, unknown>);
-export const setLocale = (_l: string): void => { /* no-op; override when using typesafe-i18n */ };
+
+/** When language enabled: updates locale store. When disabled: no-op. When enabled, LL store is set in applyLocale after loading typesafe-i18n. */
+function setLocaleDefault(l: string): void {
+	if (config?.enabled) locale.set(l);
+}
+export const setLocale = setLocaleDefault;
 
 // -----------------------------
 // Locale types
@@ -71,6 +76,38 @@ export function deepMergeDict<T>(base: T, overlay: DeepPartial<T> | undefined): 
 // -----------------------------
 // Locale utilities
 // -----------------------------
+
+/**
+ * Matches the first path segment if it looks like a BCP 47 locale (e.g. en, pt-br, zh-Hans).
+ * Language 2–3 letters; optional subtags 2–8 alphanumeric. Locale is always first in URL.
+ */
+const FIRST_SEGMENT_LOCALE_REGEX = /^\/[a-z]{2,3}(-[a-z0-9]{2,8})*(?=\/|$)/;
+
+/**
+ * Returns the first path segment if it looks like a locale, else null.
+ */
+export function getFirstSegmentLocale(pathname: string): string | null {
+	const m = pathname.match(/^\/([a-z]{2,3}(-[a-z0-9]{2,8})*)(?=\/|$)/);
+	return m ? m[1] : null;
+}
+
+/**
+ * Returns pathname with the first segment stripped iff it matches a locale.
+ * Use to remove any leading locale segment before prepending a new one.
+ */
+export function pathWithoutFirstLocale(pathname: string): string {
+	return pathname.replace(FIRST_SEGMENT_LOCALE_REGEX, '') || '/';
+}
+
+/**
+ * Builds the path for a locale switch: strip any locale in the first segment, then prepend newLocale if not default.
+ * Ensures the locale is only in the first position (no …/th/pt-br/…).
+ */
+export function pathWithLocale(pathname: string, newLocale: string, defaultLocale: string): string {
+	const without = pathWithoutFirstLocale(pathname);
+	if (newLocale === defaultLocale) return without;
+	return without === '/' ? `/${newLocale}` : `/${newLocale}${without}`;
+}
 
 // Fallback detectLocale function when typesafe-i18n is not available
 const fallbackDetectLocale = (navigatorLanguage: string, availableLocales: string[]) => {
@@ -190,20 +227,37 @@ export const getLocale = (): string => {
 };
 
 // set the active locale for $LL (and persist in localStorage on browser)
-// - Ensures base + active dictionaries are loaded on the client before switching
-export const applyLocale = async (locale: string) => {
+// - When enabled: loads typesafe-i18n locale, updates locale + LL stores so t() returns translations
+// - When disabled: no-op
+export const applyLocale = async (localeToApply: string) => {
 	if (!config?.enabled) return;
 
-	if (browser) {
-		setStoredLocale(locale);
+	if (browser) setStoredLocale(localeToApply);
+	setLocale(localeToApply);
+
+	if (!browser) return;
+	try {
+		const util = await import('../../i18n/i18n-util');
+		const utilAsync = await import('../../i18n/i18n-util.async');
+		if (util.isLocale(localeToApply)) {
+			await utilAsync.loadLocaleAsync(localeToApply);
+			LL.set(util.i18nObject(localeToApply) as unknown as Record<string, unknown>);
+		}
+	} catch {
+		// typesafe-i18n or i18n folder not present; LL stays as proxy, t() returns keys
 	}
-	setLocale(locale);
 };
 
 // preload a locale dictionary into memory (used by layout load)
-export const loadLocaleAsync = async (_locale: string) => {
+export const loadLocaleAsync = async (localeToLoad: string) => {
 	if (!config?.enabled) return;
-	// No external i18n; override when using typesafe-i18n
+	try {
+		const util = await import('../../i18n/i18n-util');
+		const utilAsync = await import('../../i18n/i18n-util.async');
+		if (util.isLocale(localeToLoad)) await utilAsync.loadLocaleAsync(localeToLoad);
+	} catch {
+		// typesafe-i18n or i18n folder not present
+	}
 };
 
 // Layout load function for i18n

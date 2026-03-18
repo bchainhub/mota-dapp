@@ -1,6 +1,6 @@
 import type { LayoutServerLoad } from './$types';
 import { redirect, error } from '@sveltejs/kit';
-import { getAvailableLocales } from '$lib/helpers/i18n';
+import { getAvailableLocales, getFirstSegmentLocale, pathWithoutFirstLocale } from '$lib/helpers/i18n';
 
 import { getSiteConfig } from '$lib/helpers/siteConfig';
 const languageConfig = getSiteConfig()?.language;
@@ -20,9 +20,10 @@ export const load: LayoutServerLoad = async ({ url, params, request, locals }) =
 	// 1) derive candidate locale from URL params
 	let locale = params.lang ?? defaultLocale;
 
-	// 2) if a locale is in the URL but it's the default, strip it
-	if (params.lang && params.lang === defaultLocale) {
-		const without = url.pathname.replace(`/${defaultLocale}`, '') || '/';
+	// 2) if the first path segment is the default locale, redirect to path without it (locale only in first position)
+	const firstSegment = getFirstSegmentLocale(url.pathname);
+	if (firstSegment && firstSegment.toLowerCase() === defaultLocale.toLowerCase()) {
+		const without = pathWithoutFirstLocale(url.pathname);
 		throw redirect(302, `${without}${url.search}`);
 	}
 

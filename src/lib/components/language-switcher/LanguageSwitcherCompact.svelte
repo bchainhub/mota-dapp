@@ -5,7 +5,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { getLocale, applyLocale } from '$lib/helpers/i18n';
+	import { getLocale, applyLocale, pathWithLocale } from '$lib/helpers/i18n';
 	import { getSiteConfig } from '$lib/helpers/siteConfig';
 	import { locale as localeStore } from '$lib/helpers/i18n';
 
@@ -78,25 +78,14 @@
 	};
 
 	const selectItem = async (item: any) => {
-		// Capture previous locale and path before applyLocale; after applyLocale the store is already the new locale.
-		const previousLocale = effectiveLocale ?? getLocale();
 		const newLocale = item.id;
 		const defaultLocale = (getSiteConfig()?.language as { defaultLocale?: string } | undefined)?.defaultLocale ?? 'en';
-		const currentPath = page.url.pathname;
 
-		// Update URL: only the first path segment is the locale (strict). Strip it iff it equals *previous* locale, then add new one.
-		const firstSegmentMatch = currentPath.match(/^\/([a-z]{2,3}(-[a-z0-9]{2,8})*)(?=\/|$)/);
-		const firstSegmentIsPreviousLocale = firstSegmentMatch && firstSegmentMatch[1] === previousLocale;
-		let newPath =
-			firstSegmentIsPreviousLocale
-				? (currentPath.replace(new RegExp(`^/${previousLocale.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`), '') || '/')
-				: currentPath;
-		if (newLocale !== defaultLocale) {
-			newPath = newPath === '/' ? `/${newLocale}` : `/${newLocale}${newPath}`;
-		}
-
-		// Apply locale (updates store; UI follows) then navigate so URL matches
+		// Apply locale (updates store; UI follows)
 		await applyLocale(newLocale);
+
+		// Update URL: always strip any locale in the first segment, then prepend new one (locale only in first position).
+		const newPath = pathWithLocale(page.url.pathname, newLocale, defaultLocale);
 		await goto(newPath as any, { replaceState: true });
 
 		onselect?.(item);
