@@ -22,7 +22,7 @@
 	import { filterNavItemsByAuth } from '$lib/helpers/nav';
 	import { evaluateShowRule } from '$lib/helpers/showRule';
 	import { getStoredTheme, setStoredTheme, removeStoredTheme } from '$lib/helpers/storageKeys';
-	import { getSiteConfig } from '$lib/helpers/siteConfig';
+	import { getSiteConfig, getSiteTitleParts } from '$lib/helpers/siteConfig';
 
 	const { layoutData, session: sessionProp = undefined }: { layoutData?: Record<string, unknown>; session?: App.Locals['session'] } = $props();
 
@@ -366,8 +366,9 @@
 					/>
 				</a>
 			{:else if _cfg?.title}
+				{@const titleParts = getSiteTitleParts(_cfg)}
 				<a href="/" class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'lg:mb-6' : ''}`}>
-					<h1 class="text-2xl font-bold {style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}">{_cfg.title}</h1>
+					<h1 class="text-2xl font-bold {style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}">{titleParts.brand}{titleParts.poweredBy ? ` | ${titleParts.poweredBy}` : ''}</h1>
 				</a>
 			{/if}
 			<!-- Desktop Navigation - Hidden on sm and md, visible on lg+ -->

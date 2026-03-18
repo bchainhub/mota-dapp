@@ -28,6 +28,19 @@ export function getSiteConfig(): Config | undefined {
 }
 
 /**
+ * Parse site title into brand and "powered by" parts when it contains "|".
+ * Splits by "|", trims each part. If no "|", brand is the full title and poweredBy is undefined.
+ */
+export function getSiteTitleParts(config?: Config): { brand: string; poweredBy: string | undefined } {
+	const raw = config?.title?.trim() ?? '';
+	if (!raw) return { brand: '', poweredBy: undefined };
+	const idx = raw.indexOf('|');
+	if (idx === -1) return { brand: raw, poweredBy: undefined };
+	const parts = raw.split('|').map((s) => s.trim());
+	return { brand: parts[0] ?? raw, poweredBy: parts[1] || undefined };
+}
+
+/**
  * Returns true if the given API version is enabled.
  * Uses api.activeVersions: string (one version) or string[] (multiple). Comparison is case-insensitive.
  * If activeVersions is not defined, all versions are allowed. If api is omitted, reads from getSiteConfig()?.api.
