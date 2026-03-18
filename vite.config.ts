@@ -20,7 +20,7 @@ const siteUrl = process.env.PUBLIC_SITE_URL || 'http://localhost:5173'; // Site 
 
 // ─── Client config (no server-only keys; used in define and client bundles) ───
 const siteConfigClient: Config = {
-	title: 'MOTA ĐApp ₡ore', // Site title - keep `₡ore` if you want to let people know it's powered by Core Infra
+	title: 'MOTA ĐApp | ₡ore', // Site title: split by "|" → [brand, poweredBy]; e.g. brand "MOTA ĐApp", powered by "₡ore"
 	url: siteUrl,
 	organizationName: 'bchainhub', // Organization name - In most cases it's your GitHub username
 	projectName: 'mota-dapp', // Project name - In most cases it's your repo name

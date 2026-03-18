@@ -9,7 +9,6 @@ const config = {
 
 	kit: {
 		alias: {
-			$lang: 'src/i18n',
 			$data: 'src/data',
 			$components: 'src/lib/components',
 			$modules: 'src/lib/modules'

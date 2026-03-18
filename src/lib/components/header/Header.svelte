@@ -5,8 +5,7 @@
 	import { ArrowUpRight, Eclipse, Menu, Moon, Sun, X } from 'lucide-svelte';
 	import { ActionsDropdown, Icon, LanguageSwitcher, LanguageSwitcherCompact, Submenu, SubmenuCompact } from '$components';
 	import { asDynamicIcon } from '$lib/helpers/icon';
-	// @ts-ignore - LL might not be available if i18n library not installed
-	import { LL, locale as localeStore } from '$lang/i18n-svelte';
+	import { LL, locale as localeStore } from '$lib/helpers/i18n';
 	import { t, getAvailableLocalesWithNamesAsync, applyLocale } from '$lib/helpers/i18n';
 	import { walletAddress, walletType, autoLogin, shouldAutoConnect, initPostInstallWalletAction, isCoreEcosystem } from '$modules/auth/web3';
 	import type { ShortFormatKind } from '$lib/helpers/shortFormat';
@@ -23,7 +22,7 @@
 	import { filterNavItemsByAuth } from '$lib/helpers/nav';
 	import { evaluateShowRule } from '$lib/helpers/showRule';
 	import { getStoredTheme, setStoredTheme, removeStoredTheme } from '$lib/helpers/storageKeys';
-	import { getSiteConfig } from '$lib/helpers/siteConfig';
+	import { getSiteConfig, getSiteTitleParts } from '$lib/helpers/siteConfig';
 
 	const { layoutData, session: sessionProp = undefined }: { layoutData?: Record<string, unknown>; session?: App.Locals['session'] } = $props();
 
@@ -354,9 +353,9 @@
 </script>
 
 <header
-	class={`fixed top-8 left-0 right-0 z-50 w-full flex justify-center lg:px-8 navigation ${orientation === 'vertical' ? 'vertical lg:mr-4' : 'horizontal'} transition-opacity duration-300 ease-in-out ${!headerVisible && hideOnScroll ? 'opacity-0' : 'opacity-100'}`}
+	class={`fixed top-8 left-0 right-0 z-50 w-full flex justify-center lg:px-8 navigation ${orientation === 'vertical' ? 'vertical lg:mr-4' : 'horizontal'} ${orientation === 'vertical' && hideOnScroll ? 'transition-[transform,opacity] duration-300 ease-in-out' : 'transition-opacity duration-300 ease-in-out'} ${orientation === 'vertical' && hideOnScroll ? (!headerVisible ? '-translate-x-full opacity-0 pointer-events-none' : 'opacity-100') : (!headerVisible && hideOnScroll ? 'opacity-0' : 'opacity-100')}`}
 >
-	<div class={`nav-container container w-full flex items-center lg:mx-3 p-3 lg:rounded-xl relative z-50 ${style === 'transparent' ? 'transparent' : style === 'blur' ? 'bg-slate-900/80 backdrop-blur-md border border-slate-700/50' : style === 'auto' ? 'bg-slate-900/90 border border-slate-700/50 dark:bg-slate-200/90 dark:border dark:border-slate-400/50' : 'bg-slate-900/90 border border-slate-700/50'} lg:mt-6 ${orientation === 'vertical' ? 'lg:flex-col lg:max-w-[300px]' : ''}`} style={style === 'blur' ? 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);' : ''}>
+	<div class={`nav-container container w-full flex items-center lg:mx-3 p-3 lg:rounded-xl relative z-50 ${style === 'transparent' ? 'transparent' : style === 'blur' ? 'bg-slate-900/80 backdrop-blur-md border border-slate-700/50' : style === 'auto' ? 'bg-slate-900/90 border border-slate-700/50 dark:bg-slate-200/90 dark:border dark:border-slate-400/50' : 'bg-slate-900/90 border border-slate-700/50'} lg:mt-6 ${orientation === 'vertical' ? 'lg:flex-col lg:max-w-[300px] lg:pt-6' : ''}`} style={style === 'blur' ? 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);' : ''}>
 		<div class={`w-full flex items-center desktop-menu min-w-0 min-h-12 ${orientation === 'vertical' ? 'lg:flex-col lg:gap-4 lg:pb-6' : ''}`}>
 			{#if logo}
 				<a href="/" class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'lg:mb-6' : ''}`}>
@@ -367,8 +366,9 @@
 					/>
 				</a>
 			{:else if _cfg?.title}
+				{@const titleParts = getSiteTitleParts(_cfg)}
 				<a href="/" class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'lg:mb-6' : ''}`}>
-					<h1 class="text-2xl font-bold {style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}">{_cfg.title}</h1>
+					<h1 class="text-2xl font-bold {style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}">{titleParts.brand}{titleParts.poweredBy ? ` | ${titleParts.poweredBy}` : ''}</h1>
 				</a>
 			{/if}
 			<!-- Desktop Navigation - Hidden on sm and md, visible on lg+ -->
@@ -604,7 +604,7 @@
 					{/if}
 					<!-- Theme Switcher -->
 					{#if !disableSwitch}
-						<button onclick={rotateTheme} class="{style === 'auto' ? 'bg-white/40 dark:bg-slate-700/40' : style === 'transparent' ? 'bg-slate-700/40 dark:bg-white/40' : 'bg-white/40'} rounded-full {orientation === 'vertical' ? 'w-full h-8 justify-center' : 'w-8 h-8 justify-center'} flex items-center hover:bg-gray/80 transition-colors duration-200">
+						<button onclick={rotateTheme} class="{style === 'auto' ? 'bg-white/40 dark:bg-slate-700/40' : style === 'transparent' ? 'bg-slate-700/40 dark:bg-white/40' : 'bg-white/40'} rounded-full {orientation === 'vertical' ? 'w-full min-w-0 h-10 justify-center px-4' : 'w-8 h-8 justify-center'} flex items-center hover:bg-gray/80 transition-colors duration-200">
 							{#if theme === 'system'}
 								<Eclipse class="w-4 h-4 {style === 'auto' ? 'text-slate-900 dark:text-white' : style === 'transparent' ? 'text-white dark:text-slate-900' : 'text-slate-900'}" />
 							{:else if theme === 'dark'}

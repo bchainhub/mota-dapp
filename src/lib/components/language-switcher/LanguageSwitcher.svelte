@@ -8,7 +8,7 @@
 	import { applyLocale } from '$lib/helpers/i18n';
 	import { getStoredLocale } from '$lib/helpers/storageKeys';
 	import { getSiteConfig } from '$lib/helpers/siteConfig';
-	import { locale as localeStore } from '$lang/i18n-svelte';
+	import { locale as localeStore } from '$lib/helpers/i18n';
 
 	let {
 		currentLocale = 'en',

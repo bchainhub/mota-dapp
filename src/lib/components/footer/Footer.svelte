@@ -5,8 +5,7 @@
 	import { Icon, Tooltip } from '$components';
 	import { Key } from 'lucide-svelte';
 	import { asDynamicIcon } from '$lib/helpers/icon';
-	// @ts-ignore - LL might not be available if i18n library not installed
-	import { LL } from '$lang/i18n-svelte';
+	import { LL } from '$lib/helpers/i18n';
 	import { t } from '$lib/helpers/i18n';
 	import { walletAddress } from '$modules/auth/web3';
 	import {
@@ -18,7 +17,7 @@
 	} from '$modules/auth/nav-actions';
 	import { shouldShowItem, type ItemWithShow } from '$lib/helpers/nav';
 	import { loadModule } from '$lib/helpers/modules';
-	import { getSiteConfig } from '$lib/helpers/siteConfig';
+	import { getSiteConfig, getSiteTitleParts } from '$lib/helpers/siteConfig';
 
 	const _cfg = getSiteConfig();
 	const footerCfg = _cfg?.themeConfig?.footer;
@@ -218,8 +217,9 @@
 					<img src={logo.src} alt={logo.alt} class="h-10" />
 				</a>
 			{:else if _cfg?.title}
+				{@const titleParts = getSiteTitleParts(_cfg)}
 				<a href="/" class="flex items-center mb-4 md:mb-0">
-					<h1 class="text-xl font-bold">{_cfg.title}</h1>
+					<h1 class="text-xl font-bold">{titleParts.brand}{titleParts.poweredBy ? ` | ${titleParts.poweredBy}` : ''}</h1>
 				</a>
 			{/if}
 			<div class="text-center text-sm text-footer-link">

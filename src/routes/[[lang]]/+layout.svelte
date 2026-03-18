@@ -100,18 +100,19 @@
 			{/if}
 		{/each}
 	{/if}
+	<meta name="generator" content="MOTA" />
 </svelte:head>
 
 <div
 	class={`view ${navbar && navbar.orientation === 'vertical' ? 'vertical-max-w flex flex-col lg:flex-row lg:mx-auto lg:container' : 'flex flex-col'}`}
 >
 	<div
-		class={`header-wrapper ${navbar && navbar.orientation === 'vertical' ? 'lg:flex-shrink-0 lg:h-auto max-lg:contents transition-all duration-500 ease-in-out' : 'contents'} ${navbar && navbar.orientation === 'vertical' && navbar.hideOnScroll && isNavHidden ? 'lg:hidden' : ''}`}
+		class={`header-wrapper ${navbar && navbar.orientation === 'vertical' ? 'lg:flex-shrink-0 lg:h-auto lg:min-w-0 max-lg:contents' : 'contents'} ${navbar && navbar.orientation === 'vertical' ? 'lg:w-[320px]' : ''} ${navbar && navbar.orientation === 'vertical' && navbar.hideOnScroll ? 'transition-[width] duration-300 ease-in-out' : ''} ${navbar && navbar.orientation === 'vertical' && navbar.hideOnScroll && isNavHidden ? 'lg:!w-0 lg:overflow-hidden' : ''}`}
 	>
 		<Header layoutData={data} />
 	</div>
 	<main
-		class={`container flex-1 mx-auto px-4 xl:px-0 ${navbar && navbar.orientation === 'vertical' ? '' : 'pt-8'}`}
+		class={`container flex-1 mx-auto px-4 xl:px-0 min-w-0 ${navbar && navbar.orientation === 'vertical' && navbar.hideOnScroll ? 'transition-[width] duration-300 ease-in-out' : ''} ${navbar && navbar.orientation === 'vertical' ? '' : 'pt-8'}`}
 	>
 		<slot />
 	</main>
