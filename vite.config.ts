@@ -30,7 +30,7 @@ const siteConfigClient: Config = {
 		navbar: {
 			logo: {
 				src: '/img/logo.svg', // Logo path in static folder
-				srcDark: '/img/logo-dark.svg', // Light logo for dark theme
+				srcDark: '/img/logo-dark.svg', // Shown in dark theme / auto when navbar is dark (blur=always; transparent=when dark; auto=when user light)
 				alt: 'MOTA' // Logo alt attribute
 			},
 			style: 'blur', // Navbar style (auto, blur, transparent)
