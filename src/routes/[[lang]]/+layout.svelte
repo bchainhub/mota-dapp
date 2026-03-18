@@ -100,6 +100,7 @@
 			{/if}
 		{/each}
 	{/if}
+	<meta name="generator" content="MOTA" />
 </svelte:head>
 
 <div
