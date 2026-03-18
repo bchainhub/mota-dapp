@@ -72,6 +72,38 @@ export function deepMergeDict<T>(base: T, overlay: DeepPartial<T> | undefined): 
 // Locale utilities
 // -----------------------------
 
+/**
+ * Matches the first path segment if it looks like a BCP 47 locale (e.g. en, pt-br, zh-Hans).
+ * Language 2–3 letters; optional subtags 2–8 alphanumeric. Locale is always first in URL.
+ */
+const FIRST_SEGMENT_LOCALE_REGEX = /^\/[a-z]{2,3}(-[a-z0-9]{2,8})*(?=\/|$)/;
+
+/**
+ * Returns the first path segment if it looks like a locale, else null.
+ */
+export function getFirstSegmentLocale(pathname: string): string | null {
+	const m = pathname.match(/^\/([a-z]{2,3}(-[a-z0-9]{2,8})*)(?=\/|$)/);
+	return m ? m[1] : null;
+}
+
+/**
+ * Returns pathname with the first segment stripped iff it matches a locale.
+ * Use to remove any leading locale segment before prepending a new one.
+ */
+export function pathWithoutFirstLocale(pathname: string): string {
+	return pathname.replace(FIRST_SEGMENT_LOCALE_REGEX, '') || '/';
+}
+
+/**
+ * Builds the path for a locale switch: strip any locale in the first segment, then prepend newLocale if not default.
+ * Ensures the locale is only in the first position (no …/th/pt-br/…).
+ */
+export function pathWithLocale(pathname: string, newLocale: string, defaultLocale: string): string {
+	const without = pathWithoutFirstLocale(pathname);
+	if (newLocale === defaultLocale) return without;
+	return without === '/' ? `/${newLocale}` : `/${newLocale}${without}`;
+}
+
 // Fallback detectLocale function when typesafe-i18n is not available
 const fallbackDetectLocale = (navigatorLanguage: string, availableLocales: string[]) => {
 	// Simple fallback: try to match language code (e.g., 'en-US' -> 'en')
