@@ -52,7 +52,7 @@
 		orientation = 'horizontal',
 		style = 'blur',
 		iconExternal,
-		leftItemsPosition = 'left',
+		itemsPosition = 'side',
 		hideOnScroll = false
 	} = navbarCfg?.navbar ?? {};
 	const { disableSwitch, defaultMode, respectPrefersColorScheme } =
@@ -374,7 +374,7 @@
 			<!-- Desktop Navigation - Hidden on sm and md, visible on lg+ -->
 			<div class={`hidden lg:flex flex-1 mx-4 min-w-0 ${orientation === 'vertical' ? 'lg:flex-col' : 'scroll-smooth'} relative`}>
 			<div class="flex-1 min-w-0">
-					<ul class={`flex items-center ${orientation === 'vertical' ? 'gap-2 lg:flex-col lg:items-stretch w-full' : leftItemsPosition === 'center' ? 'gap-4 flex-wrap justify-center w-full' : 'gap-4 flex-wrap justify-start w-full'}`}>
+					<ul class={`flex items-center ${orientation === 'vertical' ? 'gap-2 lg:flex-col lg:items-stretch w-full' : itemsPosition === 'center' ? 'gap-4 flex-wrap justify-center w-full' : 'gap-4 flex-wrap justify-start w-full'}`}>
 						{#each visibleItemsWithActions as { label, to, href, target, rel, position, icon, className, submenu, action }}
 							{#if orientation === 'vertical' || position !== 'right'}
 								<li class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'w-full justify-start' : ''}`}>

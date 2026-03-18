@@ -83,11 +83,11 @@ declare module 'vite-plugin-config' {
 				 */
 				iconExternal?: boolean;
 				/**
-				 * leftItemsPosition
-				 * @description Alignment of left-side nav items.
-				 * @values `'left'` | `'center'`
+				 * itemsPosition
+				 * @description Alignment of nav items (horizontal layout).
+				 * @values `'side'` (left) | `'center'`
 				 */
-				leftItemsPosition?: 'left' | 'center';
+				itemsPosition?: 'side' | 'center';
 			};
 			/**
 			 * footer

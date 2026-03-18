@@ -30,14 +30,14 @@ const siteConfigClient: Config = {
 		navbar: {
 			logo: {
 				src: '/img/logo.svg', // Logo path in static folder
-				srcDark: '/img/logo-dark.svg', // Logo path in static folder
+				srcDark: '/img/logo-dark.svg', // Light logo for dark theme
 				alt: 'MOTA' // Logo alt attribute
 			},
 			style: 'blur', // Navbar style (auto, blur, transparent)
 			orientation: 'horizontal', // Navbar orientation (horizontal, vertical)
 			hideOnScroll: false, // Hide navbar on scroll down
 			iconExternal: true, // Icon for external links
-			leftItemsPosition: 'center', // Left items position (left, center)
+			itemsPosition: 'center', // Items position: side (left) or center
 			// Use `to` for internal links; use string action keys for connect/disconnect (manualConnect, disconnectWallet).
 			items: [
 				// Navbar items
@@ -50,7 +50,7 @@ const siteConfigClient: Config = {
 			]
 		},
 		footer: {
-			style: 'transparent', // Footer style (auto, dark, light, transparent)
+			style: 'transparent', // Footer style (transparent, light, dark)
 			logo: {
 				src: '/img/logo-footer.svg', // Logo path in static folder
 				alt: 'MOTA' // Logo alt attribute
