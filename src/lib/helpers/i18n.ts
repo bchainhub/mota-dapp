@@ -172,7 +172,7 @@ export const getAvailableLocalesWithNames = (): Array<{ code: string; name: stri
 // Locale display (name/icon from each locale's language.descriptiveName in src/i18n). Uses dynamic import to avoid circular deps.
 type LocaleDisplay = { name: string; icon?: string };
 const localeDisplayCache: Record<string, LocaleDisplay> = {};
-const localeModules = import.meta.glob<{ default: { language?: { descriptiveName?: string; name?: string; icon?: string } } }>(
+const localeModules = import.meta.glob<{ default: { language?: { code?: string; descriptiveName?: string; name?: string; icon?: string } } }>(
 	'../../i18n/*/index.ts'
 );
 
@@ -187,9 +187,14 @@ export async function getLocaleDisplayAsync(code: string): Promise<LocaleDisplay
 	try {
 		const mod = await loader();
 		const d = mod?.default;
+		// Only use language block if it belongs to this locale (e.g. sk must have language.code === 'sk'). Otherwise merged base (e.g. en) would show for sk.
+		if (d?.language?.code !== code) {
+			localeDisplayCache[code] = { name: code };
+			return localeDisplayCache[code];
+		}
 		localeDisplayCache[code] = {
-			name: d?.language?.descriptiveName ?? d?.language?.name ?? code,
-			icon: d?.language?.icon
+			name: d.language.descriptiveName ?? d.language.name ?? code,
+			icon: d.language.icon
 		};
 		return localeDisplayCache[code];
 	} catch {
