@@ -353,7 +353,7 @@
 </script>
 
 <header
-	class={`fixed top-8 left-0 right-0 z-50 w-full flex justify-center lg:px-8 navigation ${orientation === 'vertical' ? 'vertical lg:mr-4' : 'horizontal'} transition-opacity duration-300 ease-in-out ${!headerVisible && hideOnScroll ? 'opacity-0' : 'opacity-100'}`}
+	class={`fixed top-8 left-0 right-0 z-50 w-full flex justify-center lg:px-8 navigation ${orientation === 'vertical' ? 'vertical lg:mr-4' : 'horizontal'} ${orientation === 'vertical' && hideOnScroll ? 'transition-[transform,opacity] duration-300 ease-in-out' : 'transition-opacity duration-300 ease-in-out'} ${orientation === 'vertical' && hideOnScroll ? (!headerVisible ? '-translate-x-full opacity-0 pointer-events-none' : 'opacity-100') : (!headerVisible && hideOnScroll ? 'opacity-0' : 'opacity-100')}`}
 >
 	<div class={`nav-container container w-full flex items-center lg:mx-3 p-3 lg:rounded-xl relative z-50 ${style === 'transparent' ? 'transparent' : style === 'blur' ? 'bg-slate-900/80 backdrop-blur-md border border-slate-700/50' : style === 'auto' ? 'bg-slate-900/90 border border-slate-700/50 dark:bg-slate-200/90 dark:border dark:border-slate-400/50' : 'bg-slate-900/90 border border-slate-700/50'} lg:mt-6 ${orientation === 'vertical' ? 'lg:flex-col lg:max-w-[300px] lg:pt-6' : ''}`} style={style === 'blur' ? 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);' : ''}>
 		<div class={`w-full flex items-center desktop-menu min-w-0 min-h-12 ${orientation === 'vertical' ? 'lg:flex-col lg:gap-4 lg:pb-6' : ''}`}>
