@@ -322,7 +322,7 @@
 							? 'connected'
 							: ''}"
 					></span>
-					<p class="text-sm text-footer-link text-nowrap">{connectionStatus ? t('common.online', $LL) : t('common.offline', $LL)}</p>
+					<p class="text-sm text-footer-link text-nowrap">{_cfg?.language?.enabled ? (connectionStatus ? t('common.online', $LL) : t('common.offline', $LL)) : (connectionStatus ? 'Online' : 'Offline')}</p>
 				</div>
 			</div>
 		</div>
