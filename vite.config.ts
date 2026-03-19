@@ -1,10 +1,16 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import type { Config } from 'vite-plugin-config';
 import tailwindcss from '@tailwindcss/vite';
 import { resolveExtensionlessPlugin } from './src/lib/helpers/vite-resolve-extensionless';
+
 declare const process: { env: Record<string, string | undefined> };
+
+/** Project root (vite.config.ts directory). Duplicates kit.alias so Vite/SSR resolves `$components/*` etc. reliably. */
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 // Language configuration: availableLocales as locale codes; names are read from each locale's language.descriptiveName in src/i18n
 const languageConfig = {
@@ -105,6 +111,13 @@ const siteConfigClient: Config = {
 };
 
 export default defineConfig({
+	resolve: {
+		alias: {
+			$components: path.resolve(projectRoot, 'src/lib/components'),
+			$data: path.resolve(projectRoot, 'src/data'),
+			$modules: path.resolve(projectRoot, 'src/lib/modules')
+		}
+	},
 	plugins: [
 		resolveExtensionlessPlugin(),
 		tailwindcss(),
