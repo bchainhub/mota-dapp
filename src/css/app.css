@@ -89,18 +89,18 @@ body {
 	flex: 1;
 }
 
-header {
+.site-header {
 	position: sticky;
 	top: 0;
 	z-index: 1000;
 	transition: transform 300ms ease-in-out;
 }
 
-header.nav-hidden {
+.site-header.nav-hidden {
 	transform: translateY(-100%);
 }
 
-header a {
+.site-header a {
 	@apply no-underline!;
 }
 
@@ -240,33 +240,35 @@ label {
 		max-width: 100%;
 	}
 
-	header.transparent a {
+	.site-header.transparent a {
 		@apply text-white;
 	}
 
-	header.transparent a:hover {
+	.site-header.transparent a:hover {
 		@apply text-gray-300;
 	}
 
-	header.transparent button {
+	.site-header.transparent button {
 		@apply text-white;
 	}
 
-	header.transparent button:hover {
+	.site-header.transparent button:hover {
 		@apply text-gray-300;
 	}
 }
 
 @media (min-width: 768px) {
-	header.transparent.vertical nav ul li a, header.transparent.vertical nav ul li button {
+	.site-header.transparent.vertical nav ul li a,
+	.site-header.transparent.vertical nav ul li button {
 		@apply rounded-md;
 	}
 
-	header.transparent.vertical nav ul li a:hover, header.transparent.vertical nav ul li button:hover {
+	.site-header.transparent.vertical nav ul li a:hover,
+	.site-header.transparent.vertical nav ul li button:hover {
 		@apply bg-gray-700 rounded-md;
 	}
 
-	header.transparent {
+	.site-header.transparent {
 		background-color: transparent;
 		box-shadow: none;
 		backdrop-filter: blur(7px);
