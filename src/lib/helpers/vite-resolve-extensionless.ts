@@ -2,7 +2,9 @@
  * Vite plugin helper: resolve extensionless ESM imports in node_modules for Deno/Node SSR.
  * e.g. lucide-svelte imports ./icons/index without .js; this resolves to ./icons/index.js.
  */
+// @ts-expect-error
 import path from 'node:path';
+// @ts-expect-error
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 
