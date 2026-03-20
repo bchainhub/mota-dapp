@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { isDev } from '$lib/helpers/dev';
+import type { LLType } from '$lib/helpers/i18n';
 import { getSiteConfig } from '$lib/helpers/siteConfig';
 import { connectWallet, disconnectWallet } from './web3';
 
@@ -144,7 +145,9 @@ export type AuthNavActions = {
  * Returns reusable auth nav actions (login, register, connect, disconnect)
  * for use in header, footer, or any component. Pass LL (i18n) for messages.
  */
-export function getAuthNavActions(ll: AuthNavMessages): AuthNavActions {
+export function getAuthNavActions(ll: LLType): AuthNavActions {
+	const { helpers } = ll as unknown as AuthNavMessages;
+	const wallet = helpers.wallet;
 	const auth = getAuthConfig();
 	const authEnabled = auth?.enabled ?? false;
 	const strategy = auth?.strategy;
@@ -157,16 +160,16 @@ export function getAuthNavActions(ll: AuthNavMessages): AuthNavActions {
 		connect: () => {
 			if (authEnabled && browser && web3Enabled) {
 				connectWallet(true, {
-					walletNotConfigured: ll.helpers.wallet.walletNotConfigured(),
-					walletNotInstalled: ll.helpers.wallet.walletNotInstalled(),
-					walletCannotConnect: ll.helpers.wallet.walletCannotConnect(),
-					walletConnected: ll.helpers.wallet.walletConnected()
+					walletNotConfigured: wallet.walletNotConfigured(),
+					walletNotInstalled: wallet.walletNotInstalled(),
+					walletCannotConnect: wallet.walletCannotConnect(),
+					walletConnected: wallet.walletConnected()
 				});
 			}
 		},
 		disconnect: () => {
 			disconnectWallet({
-				walletDisconnected: ll.helpers.wallet.walletDisconnected()
+				walletDisconnected: wallet.walletDisconnected()
 			});
 		}
 	};
