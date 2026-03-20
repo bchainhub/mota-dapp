@@ -47,7 +47,7 @@ declare module 'vite-plugin-config' {
 				 * logo
 				 * @description Logo paths for light and dark theme, plus alt text.
 				 */
-				logo?: { src: string; srcDark: string; alt: string };
+				logo?: { src: string; srcDark?: string; alt?: string };
 				/**
 				 * items
 				 * @description Nav items: use `to` for internal, `href` for external; action keys: manualConnect, disconnectWallet, signin, signout.
@@ -105,7 +105,7 @@ declare module 'vite-plugin-config' {
 				 * logo
 				 * @description Footer logo: src path and alt text.
 				 */
-				logo?: { src: string; alt: string };
+				logo?: { src: string; alt?: string };
 				/**
 				 * links
 				 * @description Link groups: each has title and items (FooterLinkItem[]).
