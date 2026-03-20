@@ -83,11 +83,11 @@ const siteConfigClient: Config = {
 				// Footer liner
 				{
 					label: 'footer.termsOfService',
-					to: '/terms'
+					to: '/terms/service'
 				},
 				{
 					label: 'footer.privacyPolicy',
-					to: '/privacy'
+					to: '/terms/privacy'
 				},
 				{ label: 'footer.keyRegistry', to: '/keys' }
 			],
