@@ -28,7 +28,7 @@
 	}
 
 	a:hover {
-		@apply text-blue-700 underline;
+		@apply text-blue-700;
 	}
 }
 
