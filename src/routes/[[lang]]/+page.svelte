@@ -112,7 +112,7 @@
 				AI support is via <strong>skills</strong>. Pick your agent (Copilot, Cursor, Continue) and add skill packs so assistants know your stack and conventions.
 			</p>
 			<a
-				href="https://github.com/topics/mota-skills"
+				href="https://skills.sh"
 				target="_blank"
 				rel="noopener noreferrer"
 				class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 no-underline hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
