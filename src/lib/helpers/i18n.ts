@@ -6,10 +6,10 @@ import { getSiteConfig } from '$lib/helpers/siteConfig';
 const config = getSiteConfig()?.language;
 
 /**
- * Locale dictionary shape: nested objects and leaf translation functions.
- * Matches typesafe-i18n output structurally; defined here so this module does not depend on generated `i18n-types`.
+ * Loaded locale root (nested objects and message functions). Kept as a plain indexable type so this module never
+ * imports generated `i18n-types` (they may be absent in some builds / templates).
  */
-export type LLType = { [key: string]: LLType | ((...args: any[]) => string) };
+export type LLType = Record<string, any>;
 
 // -----------------------------
 // locale / LL / setLocale (all in helper; when language disabled = print key + defaults)
@@ -252,14 +252,15 @@ export const applyLocale = async (localeToApply: string) => {
 		const utilAsync = await import('../../i18n/i18n-util.async');
 		if (util.isLocale(localeToApply)) {
 			await utilAsync.loadLocaleAsync(localeToApply);
-			LL.set(util.i18nObject(localeToApply) as unknown as LLType);
+			LL.set(util.i18nObject(localeToApply) as LLType);
 		}
 	} catch {
 		// typesafe-i18n or i18n folder not present; LL stays as proxy, t() returns keys
 	}
 };
 
-// preload locale + sync $LL (layout load). Needed for SSR so <svelte:head> {t(..., $LL)} resolves for link previews.
+// Preload dictionary for `data.locale`. Only call `LL.set` in the browser: `LL` is a module singleton; mutating it
+// during SSR/load races across concurrent requests and causes mixed languages in production.
 export const loadLocaleAsync = async (localeToLoad: string) => {
 	if (!config?.enabled) return;
 	try {
@@ -267,7 +268,9 @@ export const loadLocaleAsync = async (localeToLoad: string) => {
 		const utilAsync = await import('../../i18n/i18n-util.async');
 		if (!util.isLocale(localeToLoad)) return;
 		await utilAsync.loadLocaleAsync(localeToLoad);
-		LL.set(util.i18nObject(localeToLoad) as unknown as LLType);
+		if (browser) {
+			LL.set(util.i18nObject(localeToLoad) as LLType);
+		}
 	} catch {
 		// typesafe-i18n or i18n folder not present
 	}
