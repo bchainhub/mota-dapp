@@ -1,11 +1,14 @@
 import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
 import { getSiteConfig } from '$lib/helpers/siteConfig';
 
 const config = getSiteConfig()?.language;
 
-/** Recursive type for LL: nested objects and/or functions returning string. Used when i18n-types (TranslationFunctions) is not available. */
+/**
+ * Locale dictionary shape: nested objects and leaf translation functions.
+ * Matches typesafe-i18n output structurally; defined here so this module does not depend on generated `i18n-types`.
+ */
 export type LLType = { [key: string]: LLType | ((...args: any[]) => string) };
 
 // -----------------------------
@@ -256,17 +259,44 @@ export const applyLocale = async (localeToApply: string) => {
 	}
 };
 
-// preload a locale dictionary into memory (used by layout load)
+// preload locale + sync $LL (layout load). Needed for SSR so <svelte:head> {t(..., $LL)} resolves for link previews.
 export const loadLocaleAsync = async (localeToLoad: string) => {
 	if (!config?.enabled) return;
 	try {
 		const util = await import('../../i18n/i18n-util');
 		const utilAsync = await import('../../i18n/i18n-util.async');
-		if (util.isLocale(localeToLoad)) await utilAsync.loadLocaleAsync(localeToLoad);
+		if (!util.isLocale(localeToLoad)) return;
+		await utilAsync.loadLocaleAsync(localeToLoad);
+		LL.set(util.i18nObject(localeToLoad) as unknown as LLType);
 	} catch {
 		// typesafe-i18n or i18n folder not present
 	}
 };
+
+/**
+ * Load a locale dictionary and return a plain tree for {@link t} (previews, snippets, etc.).
+ * Uses `loadedLocales` (raw strings), not `i18nObject` proxies: nested proxies do not work with
+ * `key in object` traversal in {@link t}, so keys would render literally otherwise.
+ * Unknown codes fall back to `baseLocale`. When language is disabled, returns the current `$LL` store value.
+ */
+export async function getLLForLocale(localeToApply: string): Promise<LLType> {
+	if (!config?.enabled) {
+		return get(LL);
+	}
+	try {
+		const util = await import('../../i18n/i18n-util');
+		const utilAsync = await import('../../i18n/i18n-util.async');
+		const loc = util.isLocale(localeToApply) ? localeToApply : util.baseLocale;
+		await utilAsync.loadLocaleAsync(loc);
+		const dict = util.loadedLocales[loc];
+		if (dict && typeof dict === 'object' && Object.keys(dict as object).length > 0) {
+			return dict as unknown as LLType;
+		}
+		return get(LL);
+	} catch {
+		return get(LL);
+	}
+}
 
 // Layout load function for i18n
 // - Preloads the active locale dictionary and the default (base) locale
