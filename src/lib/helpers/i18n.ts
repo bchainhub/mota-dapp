@@ -1,15 +1,12 @@
 import { browser } from '$app/environment';
-import { get, writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
 import { getSiteConfig } from '$lib/helpers/siteConfig';
 
 const config = getSiteConfig()?.language;
 
-/**
- * Loaded locale root (nested objects and message functions). Kept as a plain indexable type so this module never
- * imports generated `i18n-types` (they may be absent in some builds / templates).
- */
-export type LLType = Record<string, any>;
+/** Recursive type for LL: nested objects and/or functions returning string. Used when i18n-types (TranslationFunctions) is not available. */
+export type LLType = { [key: string]: LLType | ((...args: any[]) => string) };
 
 // -----------------------------
 // locale / LL / setLocale (all in helper; when language disabled = print key + defaults)
@@ -29,7 +26,8 @@ function createKeyProxy(prefix = ''): unknown {
 }
 
 export const locale = writable<string>('en');
-export const LL = writable<LLType>(createKeyProxy() as LLType);
+/** Cast: recursive `LLType` does not narrow `$LL.modules.*` for TypeScript; runtime shape is still `LLType`. */
+export const LL = writable(createKeyProxy() as LLType) as Writable<Record<string, any>>;
 
 /** When language enabled: updates locale store. When disabled: no-op. When enabled, LL store is set in applyLocale after loading typesafe-i18n. */
 function setLocaleDefault(l: string): void {
@@ -252,25 +250,20 @@ export const applyLocale = async (localeToApply: string) => {
 		const utilAsync = await import('../../i18n/i18n-util.async');
 		if (util.isLocale(localeToApply)) {
 			await utilAsync.loadLocaleAsync(localeToApply);
-			LL.set(util.i18nObject(localeToApply) as LLType);
+			LL.set(util.i18nObject(localeToApply) as unknown as LLType);
 		}
 	} catch {
 		// typesafe-i18n or i18n folder not present; LL stays as proxy, t() returns keys
 	}
 };
 
-// Preload dictionary for `data.locale`. Only call `LL.set` in the browser: `LL` is a module singleton; mutating it
-// during SSR/load races across concurrent requests and causes mixed languages in production.
+// preload a locale dictionary into memory (used by layout load)
 export const loadLocaleAsync = async (localeToLoad: string) => {
 	if (!config?.enabled) return;
 	try {
 		const util = await import('../../i18n/i18n-util');
 		const utilAsync = await import('../../i18n/i18n-util.async');
-		if (!util.isLocale(localeToLoad)) return;
-		await utilAsync.loadLocaleAsync(localeToLoad);
-		if (browser) {
-			LL.set(util.i18nObject(localeToLoad) as LLType);
-		}
+		if (util.isLocale(localeToLoad)) await utilAsync.loadLocaleAsync(localeToLoad);
 	} catch {
 		// typesafe-i18n or i18n folder not present
 	}
@@ -280,7 +273,6 @@ export const loadLocaleAsync = async (localeToLoad: string) => {
  * Load a locale dictionary and return a plain tree for {@link t} (previews, snippets, etc.).
  * Uses `loadedLocales` (raw strings), not `i18nObject` proxies: nested proxies do not work with
  * `key in object` traversal in {@link t}, so keys would render literally otherwise.
- * Unknown codes fall back to `baseLocale`. When language is disabled, returns the current `$LL` store value.
  */
 export async function getLLForLocale(localeToApply: string): Promise<LLType> {
 	if (!config?.enabled) {

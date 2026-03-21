@@ -2,8 +2,14 @@
 	import { Header, Footer } from '$components';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
 	import type { LayoutData } from './$types';
-	import { applyLocale, detectLocale, getAvailableLocales } from '$lib/helpers/i18n';
+	import {
+		applyLocale,
+		detectLocale,
+		getAvailableLocales,
+		getFirstSegmentLocale
+	} from '$lib/helpers/i18n';
 	import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
 	import { getSiteConfig } from '$lib/helpers/siteConfig';
 	import type { Config } from 'vite-plugin-config';
@@ -19,16 +25,25 @@
 
 	const enabled = language?.enabled || false;
 
-	// Apply locale: URL wins over stored (mota.locale), then stored, then auto-detect, then default
+	// Apply locale: explicit path segment wins (stable during link prefetch), then URL flag + data, then stored, …
 	$: if (enabled && browser) {
 		const storedLocale = getStoredLocale();
 		const localeCodes = getAvailableLocales();
+		const segmentLocale = getFirstSegmentLocale(page.url.pathname);
+		const pathLocaleValid = Boolean(segmentLocale && localeCodes.includes(segmentLocale));
 		const urlLocaleValid =
 			(data as { fromUrl?: boolean; locale?: string }).fromUrl && data.locale && localeCodes.includes(data.locale);
 		const storedValid = storedLocale && localeCodes.includes(storedLocale);
 
-		// Priority 1: URL locale (e.g. /ru) — use it and persist so next visit follows it unless URL says otherwise
-		if (urlLocaleValid) {
+		// Priority 1a: locale in the address bar (e.g. /ru/…) — not affected by prefetch of other routes’ `data.locale`
+		if (pathLocaleValid && segmentLocale) {
+			const finalLocale = segmentLocale;
+			setStoredLocale(finalLocale);
+			document.documentElement.setAttribute('lang', finalLocale);
+			applyLocale(finalLocale);
+		}
+		// Priority 1b: server said locale came from param (same as 1a when segment exists; covers edge cases)
+		else if (urlLocaleValid) {
 			const finalLocale = data.locale;
 			setStoredLocale(finalLocale);
 			document.documentElement.setAttribute('lang', finalLocale);
