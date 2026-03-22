@@ -1,6 +1,11 @@
 import type { LayoutServerLoad } from './$types';
 import { redirect, error } from '@sveltejs/kit';
-import { getAvailableLocales, getFirstSegmentLocale, pathWithoutFirstLocale } from '$lib/helpers/i18n';
+import {
+	getAvailableLocales,
+	getFirstSegmentLocale,
+	initLLForSsr,
+	pathWithoutFirstLocale
+} from '$lib/helpers/i18n';
 
 import { getSiteConfig } from '$lib/helpers/siteConfig';
 const languageConfig = getSiteConfig()?.language;
@@ -10,6 +15,7 @@ const defaultLocale = languageConfig?.defaultLocale || 'en';
 export const load: LayoutServerLoad = async ({ url, params, request, locals }) => {
 	if (!languageConfig?.enabled) {
 		locals.locale = defaultLocale;
+		await initLLForSsr(defaultLocale);
 		const session = locals.session;
 		return {
 			locale: defaultLocale,
@@ -34,6 +40,8 @@ export const load: LayoutServerLoad = async ({ url, params, request, locals }) =
 	}
 
 	locals.locale = locale;
+
+	await initLLForSsr(locale);
 
 	// Session is set in hooks (sessionHandle) only when passkey is enabled. Include in layout data only when we have it.
 	const session = locals.session;

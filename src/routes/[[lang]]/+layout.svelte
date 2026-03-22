@@ -12,6 +12,7 @@
 	} from '$lib/helpers/i18n';
 	import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
 	import { getSiteConfig } from '$lib/helpers/siteConfig';
+	import { LL, t } from '$lib/helpers/i18n';
 	import type { Config } from 'vite-plugin-config';
 
 	export let data: LayoutData;
@@ -107,11 +108,12 @@
 	{/if}
 	{#if metaList.length}
 		{#each metaList as { name, content, property }}
+			{@const metaContent = t(content, $LL)}
 			{#if name}
-				<meta {name} {content} />
+				<meta {name} content={metaContent} />
 			{/if}
 			{#if property}
-				<meta {property} {content} />
+				<meta {property} content={metaContent} />
 			{/if}
 		{/each}
 	{/if}
