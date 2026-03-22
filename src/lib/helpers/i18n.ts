@@ -245,6 +245,15 @@ export const applyLocale = async (localeToApply: string) => {
 	setLocale(localeToApply);
 
 	if (!browser) return;
+	await initLLForSsr(localeToApply);
+};
+
+/**
+ * Load the locale dictionary and set `$LL` for the current SSR render (social crawlers, no JS).
+ * Call once per request from `[[lang]]/+layout.server.ts` after the locale is known.
+ */
+export async function initLLForSsr(localeToApply: string): Promise<void> {
+	if (!config?.enabled) return;
 	try {
 		const util = await import('../../i18n/i18n-util');
 		const utilAsync = await import('../../i18n/i18n-util.async');
@@ -255,7 +264,7 @@ export const applyLocale = async (localeToApply: string) => {
 	} catch {
 		// typesafe-i18n or i18n folder not present; LL stays as proxy, t() returns keys
 	}
-};
+}
 
 // preload a locale dictionary into memory (used by layout load)
 export const loadLocaleAsync = async (localeToLoad: string) => {
