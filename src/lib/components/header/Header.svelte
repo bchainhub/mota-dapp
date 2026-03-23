@@ -619,7 +619,7 @@
 					{/if}
 					<!-- Theme Switcher -->
 					{#if !disableSwitch}
-						<button onclick={rotateTheme} class="{style === 'auto' ? 'bg-white/40 dark:bg-slate-700/40' : style === 'transparent' ? 'bg-slate-700/40 dark:bg-white/40' : 'bg-white/40'} rounded-full {orientation === 'vertical' ? 'w-full min-w-0 h-10 justify-center px-4' : 'w-8 h-8 justify-center'} flex items-center hover:bg-gray/80 transition-colors duration-200">
+						<button onclick={rotateTheme} class="{style === 'auto' ? 'bg-white/40 dark:bg-slate-700/40' : style === 'transparent' ? 'bg-slate-700/40 dark:bg-white/40' : 'bg-white/40'} rounded-full {orientation === 'vertical' ? 'w-10 h-10 shrink-0 justify-center' : 'w-8 h-8 justify-center'} flex items-center hover:bg-gray/80 transition-colors duration-200">
 							{#if theme === 'system'}
 								<Eclipse class="w-4 h-4 {style === 'auto' ? 'text-slate-900 dark:text-white' : style === 'transparent' ? 'text-white dark:text-slate-900' : 'text-slate-900'}" />
 							{:else if theme === 'dark'}
