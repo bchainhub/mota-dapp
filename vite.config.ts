@@ -54,6 +54,12 @@ const siteConfigClient: Config = {
 					to: '/',
 					position: 'left',
 					icon: 'home'
+				},
+				{
+					href: 'https://github.com/bchainhub/dapp-starter',
+					target: '_blank',
+					position: 'right',
+					icon: 'github'
 				}
 			]
 		},
@@ -89,7 +95,16 @@ const siteConfigClient: Config = {
 					label: 'footer.privacyPolicy',
 					to: '/terms/privacy'
 				},
-				{ label: 'footer.keyRegistry', to: '/keys' }
+				{
+					label: 'footer.keyRegistry',
+					to: '/keys',
+					icon: 'key'
+				},
+				{
+					label: 'footer.poweredBy',
+					href: 'https://mota.dog',
+					target: '_blank'
+				}
 			],
 			copyright: 'footer.copyright' // Copyright text
 		},
