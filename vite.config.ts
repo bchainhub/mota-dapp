@@ -56,7 +56,6 @@ const siteConfigClient: Config = {
 					icon: 'home'
 				},
 				{
-					label: 'navbar.github',
 					href: 'https://github.com/bchainhub/dapp-starter',
 					target: '_blank',
 					position: 'right',
