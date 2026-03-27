@@ -232,17 +232,20 @@
 					{#each visibleLiner as { label, to, href, target, rel, className, icon, action }}
 						<div class="flex items-center">
 							{#if to}
-								<a href={to} class="hover:text-footer-link-hover {className}">
+								<a
+									href={to}
+									class="hover:text-footer-link-hover inline-flex items-center gap-1 {className ?? ''}"
+								>
 									{#if icon}
 										{#if typeof icon === 'string'}
-											<Icon name={icon} className="h-4 w-4 {label ? 'mr-1' : ''}" />
+											<Icon name={icon} className="h-4 w-4 shrink-0" />
 										{:else}
 											{@const IconC = asDynamicIcon(icon)}
-											<IconC class="h-4 w-4 {label ? 'mr-1' : ''}" />
+											<IconC class="h-4 w-4 shrink-0" />
 										{/if}
 									{/if}
 									{#if label}
-										{t(label, $LL)}
+										<span class="whitespace-nowrap">{t(label, $LL)}</span>
 									{/if}
 								</a>
 							{:else if href}
