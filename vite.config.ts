@@ -75,13 +75,13 @@ const siteConfigClient: Config = {
 				{
 					title: 'footer.ecosystem',
 					items: [
-						{ label: 'footer.repo', href: 'https://github.com/bchainhub/mota-dapp', target: '_blank' },
+						{ label: 'Repository', href: 'https://github.com/bchainhub/mota-dapp', target: '_blank' },
 					]
 				},
 				{
 					title: 'footer.contact',
 					items: [
-						{ label: 'footer.emailContact', to: 'mailto:support@mota.mota' }
+						{ label: 'Email', to: 'mailto:contact@blockchainhub.digital' }
 					]
 				}
 			],
@@ -97,8 +97,7 @@ const siteConfigClient: Config = {
 				},
 				{
 					label: 'footer.keyRegistry',
-					to: '/keys',
-					icon: 'key'
+					to: '/keys'
 				},
 				{
 					label: 'footer.poweredBy',
