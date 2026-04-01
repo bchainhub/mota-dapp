@@ -53,20 +53,25 @@
 	}
 </script>
 
-<div class="fixed bottom-4 right-4 space-y-2 z-20">
+<div class="fixed bottom-4 end-4 z-20 flex w-[min(18rem,calc(100vw-2rem))] flex-col gap-2">
 	{#each $toasts as { id, message, type = 'info', className } (id)}
 		<div
 			in:fade={{ duration: 150 }}
 			out:fade={{ duration: 150 }}
 			role="alert"
-			class={`toast p-4 rounded-lg shadow-lg text-white dark:text-slate-800 font-medium text-sm w-72 ${style === 'blur' ? `backdrop-blur-md ${getBlurBorderColor(type)}` : ''} ${toastType(type)} ${className}`}
+			class={`toast rounded-lg py-3 ps-4 pe-2 shadow-lg text-white dark:text-slate-800 font-medium text-sm ${style === 'blur' ? `backdrop-blur-md ${getBlurBorderColor(type)}` : ''} ${toastType(type)} ${className}`}
 			on:mouseenter={() => handleMouseEnter(id)}
 			on:mouseleave={() => handleMouseLeave(id)}
 		>
-			<div class="flex justify-between items-start">
-				<span>{message}</span>
-				<button class="ml-2 shrink-0 p-0.5 rounded hover:bg-white/20 dark:hover:bg-slate-800/30 mt-0.5" on:click={() => closeToast(id)} aria-label="Close">
-					<X size={16} />
+			<div class="flex items-start gap-2">
+				<span class="min-w-0 flex-1 text-start leading-snug">{message}</span>
+				<button
+					type="button"
+					class="shrink-0 rounded-md p-1.5 hover:bg-white/20 dark:hover:bg-slate-800/30"
+					on:click={() => closeToast(id)}
+					aria-label="Close"
+				>
+					<X size={16} class="block" aria-hidden="true" />
 				</button>
 			</div>
 		</div>

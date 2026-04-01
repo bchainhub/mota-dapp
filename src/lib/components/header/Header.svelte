@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
-	import { ArrowUpRight, Eclipse, Menu, Moon, Sun, X } from 'lucide-svelte';
+	import { ArrowUpLeft, ArrowUpRight, Eclipse, Menu, Moon, Sun, X } from 'lucide-svelte';
 	import { ActionsDropdown, Icon, LanguageSwitcher, LanguageSwitcherCompact, Submenu, SubmenuCompact } from '$components';
 	import { asDynamicIcon } from '$lib/helpers/icon';
 	import { LL, locale as localeStore } from '$lib/helpers/i18n';
@@ -157,7 +157,8 @@
 		}));
 		const logoutItem = { label: t('common.logout', $LL), to: undefined as string | undefined, className: undefined as string | undefined, icon: undefined as string | undefined, action: () => Promise.resolve(authNavActions.signout()) };
 		const disconnectItem = { label: t('navbar.disconnect', $LL), to: undefined as string | undefined, className: undefined as string | undefined, icon: undefined as string | undefined, action: () => Promise.resolve(authNavActions.disconnect()) };
-		const items = [...authMenuItems];
+		const dashboardItem = session?.user ? { label: t('content.dashboard.heading', $LL), to: '/dashboard', className: undefined as string | undefined, icon: undefined as string | undefined, action: () => goto('/dashboard') } : null;
+		const items = [...(dashboardItem ? [dashboardItem] : []), ...authMenuItems];
 		if (authEnabled && web3Enabled && $walletAddress) items.push(disconnectItem);
 		if (session?.user) items.push(logoutItem);
 		return items;
@@ -368,22 +369,29 @@
 </script>
 
 <header
-	class={`site-header fixed top-8 left-0 right-0 z-50 w-full flex justify-center lg:px-8 navigation ${style === 'transparent' ? 'transparent' : ''} ${orientation === 'vertical' ? 'vertical lg:mr-4 lg:static lg:top-auto lg:left-auto lg:right-auto lg:w-full' : 'horizontal'} ${orientation === 'vertical' && hideOnScroll ? 'transition-[transform,opacity] duration-300 ease-in-out' : 'transition-opacity duration-300 ease-in-out'} ${orientation === 'vertical' && hideOnScroll ? (!headerVisible ? '-translate-x-full opacity-0 pointer-events-none' : 'opacity-100') : (!headerVisible && hideOnScroll ? 'opacity-0' : 'opacity-100')}`}
+	class={`site-header fixed top-8 left-0 right-0 z-50 w-full flex justify-center max-lg:justify-stretch lg:px-8 navigation ${style === 'transparent' ? 'transparent' : ''} ${orientation === 'vertical' ? 'vertical lg:mr-4 lg:static lg:top-auto lg:left-auto lg:right-auto lg:w-full' : 'horizontal'} ${orientation === 'vertical' && hideOnScroll ? 'transition-[transform,opacity] duration-300 ease-in-out' : 'transition-opacity duration-300 ease-in-out'} ${orientation === 'vertical' && hideOnScroll ? (!headerVisible ? '-translate-x-full opacity-0 pointer-events-none' : 'opacity-100') : (!headerVisible && hideOnScroll ? 'opacity-0' : 'opacity-100')}`}
 >
-	<div class={`nav-container container w-full flex items-center lg:mx-3 p-3 lg:rounded-xl relative z-50 ${style === 'transparent' ? 'transparent' : style === 'blur' ? 'bg-slate-900/80 backdrop-blur-md border border-slate-700/50' : style === 'auto' ? 'bg-slate-900/90 border border-slate-700/50 dark:bg-slate-200/90 dark:border dark:border-slate-400/50' : 'bg-slate-900/90 border border-slate-700/50'} ${orientation === 'vertical' ? 'lg:mt-8' : 'lg:mt-6'} ${orientation === 'vertical' ? 'lg:flex-col lg:max-w-[300px] lg:pt-6' : ''}`} style={style === 'blur' ? 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);' : ''}>
-		<div class={`w-full flex items-center desktop-menu min-w-0 min-h-12 ${orientation === 'vertical' ? 'lg:flex-col lg:gap-4 lg:pb-6' : ''}`}>
+	<div class={`nav-container w-full max-w-full min-w-0 flex items-center lg:container lg:mx-3 p-3 lg:rounded-xl relative z-50 ${style === 'transparent' ? 'transparent' : style === 'blur' ? 'bg-slate-900/80 backdrop-blur-md border border-slate-700/50' : style === 'auto' ? 'bg-slate-900/90 border border-slate-700/50 dark:bg-slate-200/90 dark:border dark:border-slate-400/50' : 'bg-slate-900/90 border border-slate-700/50'} ${orientation === 'vertical' ? 'lg:mt-8' : 'lg:mt-6'} ${orientation === 'vertical' ? 'lg:flex-col lg:max-w-[300px] lg:pt-6' : ''}`} style={style === 'blur' ? 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);' : ''}>
+		<div class={`flex flex-1 min-w-0 items-center desktop-menu min-h-12 ${orientation === 'vertical' ? 'lg:flex-col lg:gap-4 lg:pb-6' : ''}`}>
 			{#if logo}
-				<a href="/" class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'lg:mb-6' : ''}`}>
-					<img
-						src={logoSrc}
-						alt={logo.alt}
-						class="h-6"
-					/>
+				<a
+					href="/"
+					class={`flex min-w-0 max-w-full items-center gap-2 flex-shrink-0 ${orientation === 'vertical' ? 'lg:mb-6' : ''} ${logo.className ?? ''}`}
+				>
+					<img src={logoSrc} alt={logo.alt} class="h-6 shrink-0" />
+					{#if logo.attachTitle && _cfg?.title}
+						{@const titleParts = getSiteTitleParts(_cfg)}
+						<span
+							class={`truncate text-base font-semibold ${logo.className ? '' : style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}`}
+						>
+							{titleParts.brand}
+						</span>
+					{/if}
 				</a>
 			{:else if _cfg?.title}
 				{@const titleParts = getSiteTitleParts(_cfg)}
 				<a href="/" class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'lg:mb-6' : ''}`}>
-					<h1 class="text-2xl font-bold {style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}">{titleParts.brand}{titleParts.poweredBy ? ` | ${titleParts.poweredBy}` : ''}</h1>
+					<h1 class="text-2xl font-semibold {style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}">{titleParts.brand}{titleParts.poweredBy ? ` | ${titleParts.poweredBy}` : ''}</h1>
 				</a>
 			{/if}
 			<!-- Desktop Navigation - Hidden on sm and md, visible on lg+ -->
@@ -422,15 +430,15 @@
 											theme={style}
 										/>
 									{:else if to}
-										<a href={to} class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center cursor-pointer transition-colors duration-200 {orientation === 'vertical' ? 'w-full justify-start px-4 py-2' : ''} {className ?? ''}">
+										<a href={to} class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center gap-1.5 cursor-pointer transition-colors duration-200 {orientation === 'vertical' ? 'w-full justify-start px-4 py-2' : ''} {className ?? ''}">
 											{#if icon}
 												{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-													<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 												{:else if typeof icon === 'string'}
-													<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<Icon name={icon} className="h-5 w-5 shrink-0" />
 												{:else}
 													{@const IconC = asDynamicIcon(icon)}
-													<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<IconC class="h-5 w-5 shrink-0" />
 												{/if}
 											{/if}
 											{#if label}
@@ -442,39 +450,40 @@
 											{href}
 											target={target ? target : undefined}
 											rel={rel ? rel : 'noopener'}
-											class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center cursor-pointer transition-colors duration-200 {orientation === 'vertical' ? 'w-full justify-start px-4 py-2' : ''} {className ?? ''}"
+											class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center gap-1.5 cursor-pointer transition-colors duration-200 {orientation === 'vertical' ? 'w-full justify-start px-4 py-2' : ''} {className ?? ''}"
 										>
 											{#if icon}
 												{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-													<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 												{:else if typeof icon === 'string'}
-													<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<Icon name={icon} className="h-5 w-5 shrink-0" />
 												{:else}
 													{@const IconC = asDynamicIcon(icon)}
-													<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<IconC class="h-5 w-5 shrink-0" />
 												{/if}
 											{/if}
 											{#if label}
 												<span class="whitespace-nowrap">{t(label, $LL)}</span>
 											{/if}
 											{#if typeof iconExternal === 'undefined' || iconExternal === true}
-												<ArrowUpRight class="ml-1 h-4 w-4" />
+												<ArrowUpRight class="h-4 w-4 shrink-0 rtl:hidden" aria-hidden="true" />
+												<ArrowUpLeft class="hidden h-4 w-4 shrink-0 rtl:inline" aria-hidden="true" />
 											{/if}
 										</a>
 									{:else if action}
 										<button
 											type="button"
 											onclick={action}
-											class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center cursor-pointer transition-colors duration-200 {orientation === 'vertical' ? 'w-full justify-start px-4 py-2' : ''} {className ?? ''}"
+											class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center gap-1.5 cursor-pointer transition-colors duration-200 {orientation === 'vertical' ? 'w-full justify-start px-4 py-2' : ''} {className ?? ''}"
 										>
 											{#if icon}
 												{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-													<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 												{:else if typeof icon === 'string'}
-													<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<Icon name={icon} className="h-5 w-5 shrink-0" />
 												{:else}
 													{@const IconC = asDynamicIcon(icon)}
-													<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<IconC class="h-5 w-5 shrink-0" />
 												{/if}
 											{/if}
 											{#if label}
@@ -524,15 +533,15 @@
 											theme={style}
 										/>
 									{:else if to}
-										<a href={to} class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center cursor-pointer transition-colors duration-200 {className ?? ''}">
+										<a href={to} class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center gap-1.5 cursor-pointer transition-colors duration-200 {className ?? ''}">
 													{#if icon}
 														{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-															<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+															<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 														{:else if typeof icon === 'string'}
-															<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+															<Icon name={icon} className="h-5 w-5 shrink-0" />
 														{:else}
 															{@const IconC = asDynamicIcon(icon)}
-															<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+															<IconC class="h-5 w-5 shrink-0" />
 														{/if}
 													{/if}
 													{#if label}
@@ -544,39 +553,40 @@
 													{href}
 													target={target ? target : undefined}
 													rel={rel ? rel : 'noopener'}
-													class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center cursor-pointer transition-colors duration-200 {className ?? ''}"
+													class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center gap-1.5 cursor-pointer transition-colors duration-200 {className ?? ''}"
 												>
 											{#if icon}
 												{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-													<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 												{:else if typeof icon === 'string'}
-													<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<Icon name={icon} className="h-5 w-5 shrink-0" />
 												{:else}
 													{@const IconC = asDynamicIcon(icon)}
-													<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<IconC class="h-5 w-5 shrink-0" />
 												{/if}
 											{/if}
 											{#if label}
 												<span class="whitespace-nowrap">{t(label, $LL)}</span>
 											{/if}
 											{#if typeof iconExternal === 'undefined' || iconExternal === true}
-												<ArrowUpRight class="ml-1 h-4 w-4" />
+												<ArrowUpRight class="h-4 w-4 shrink-0 rtl:hidden" aria-hidden="true" />
+												<ArrowUpLeft class="hidden h-4 w-4 shrink-0 rtl:inline" aria-hidden="true" />
 											{/if}
 										</a>
 									{:else if action}
 										<button
 											type="button"
 											onclick={action}
-											class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center cursor-pointer transition-colors duration-200 {className ?? ''}"
+											class="group {style === 'auto' ? 'text-white! hover:text-slate-300! dark:text-slate-900! dark:hover:text-slate-600!' : style === 'transparent' ? 'text-slate-900! hover:text-slate-600! dark:text-white! dark:hover:text-slate-300!' : 'text-white! hover:text-slate-300!'} font-medium text-base flex items-center gap-1.5 cursor-pointer transition-colors duration-200 {className ?? ''}"
 										>
 											{#if icon}
 												{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-													<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 												{:else if typeof icon === 'string'}
-													<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<Icon name={icon} className="h-5 w-5 shrink-0" />
 												{:else}
 													{@const IconC = asDynamicIcon(icon)}
-													<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+													<IconC class="h-5 w-5 shrink-0" />
 												{/if}
 											{/if}
 											{#if label}
@@ -591,17 +601,22 @@
 				</div>
 				<div class={`flex items-center ${orientation === 'vertical' ? 'gap-2 flex-col mt-4 w-full' : 'gap-2 whitespace-nowrap'}`}>
 					{#if authEnabled && isLoggedIn}
-						<ActionsDropdown
-							title={userDropdownTitle}
-							formatKind={userDropdownFormatKind}
-							providerIcon={userDropdownProviderIcon}
-							open={dropdownOpen}
-							items={menuItems}
-							position="right"
-							{iconExternal}
-							{orientation}
-							onChange={handleSelect}
-						/>
+						<div class="relative">
+							<ActionsDropdown
+								title={userDropdownTitle}
+								formatKind={userDropdownFormatKind}
+								providerIcon={userDropdownProviderIcon}
+								open={dropdownOpen}
+								items={menuItems}
+								position="right"
+								{iconExternal}
+								{orientation}
+								onChange={handleSelect}
+							/>
+							{#if isEnriched}
+								<span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-slate-800 dark:border-slate-900" title="Verified with CorePass"></span>
+							{/if}
+						</div>
 					{/if}
 					<!-- Language Switcher -->
 					{#if (_cfg?.language as { enabled?: boolean } | undefined)?.enabled}
@@ -633,7 +648,7 @@
 			</div>
 		</div>
 		<!-- Mobile/Tablet Hamburger Menu - Visible on sm and md, hidden on lg+ -->
-		<div class="lg:hidden flex items-center relative z-60">
+		<div class="lg:hidden flex shrink-0 items-center relative z-60">
 			<button
 				id="hamburger-button"
 				class="cursor-pointer focus:outline-hidden flex items-center relative z-60 transition-all duration-300"
@@ -689,15 +704,15 @@
 										}}
 									/>
 								{:else if to}
-									<a href={to} onclick={closeMenu} class="flex items-center justify-center w-full text-center text-white! hover:text-indigo-400! transition-colors duration-200 py-8 px-4">
+									<a href={to} onclick={closeMenu} class="flex w-full items-center justify-center gap-2 px-4 py-8 text-center text-white! transition-colors duration-200 hover:text-indigo-400!">
 										{#if icon}
 											{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-												<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 											{:else if typeof icon === 'string'}
-												<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<Icon name={icon} className="h-5 w-5 shrink-0" />
 											{:else}
 												{@const IconC = asDynamicIcon(icon)}
-												<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<IconC class="h-5 w-5 shrink-0" />
 											{/if}
 										{/if}
 										{#if label}
@@ -710,23 +725,24 @@
 										target={target ? target : undefined}
 										rel={rel ? rel : 'noopener'}
 										onclick={closeMenu}
-										class="flex items-center justify-center w-full text-center text-white! hover:text-indigo-400! transition-colors duration-200 py-8 px-4"
+										class="flex w-full items-center justify-center gap-2 px-4 py-8 text-center text-white! transition-colors duration-200 hover:text-indigo-400!"
 									>
 										{#if icon}
 											{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-												<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 											{:else if typeof icon === 'string'}
-												<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<Icon name={icon} className="h-5 w-5 shrink-0" />
 											{:else}
 												{@const IconC = asDynamicIcon(icon)}
-												<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<IconC class="h-5 w-5 shrink-0" />
 											{/if}
 										{/if}
 										{#if label}
 											<span class="whitespace-nowrap">{t(label, $LL)}</span>
 										{/if}
 										{#if typeof iconExternal === 'undefined' || iconExternal === true}
-											<ArrowUpRight class="ml-1 h-4 w-4" />
+											<ArrowUpRight class="h-4 w-4 shrink-0 rtl:hidden" aria-hidden="true" />
+												<ArrowUpLeft class="hidden h-4 w-4 shrink-0 rtl:inline" aria-hidden="true" />
 										{/if}
 									</a>
 								{:else if action}
@@ -736,16 +752,16 @@
 											action();
 											closeMenu();
 										}}
-										class="flex items-center justify-center w-full text-center text-white! hover:text-indigo-400! transition-colors duration-200 py-8 px-4"
+										class="flex w-full items-center justify-center gap-2 px-4 py-8 text-center text-white! transition-colors duration-200 hover:text-indigo-400!"
 									>
 										{#if icon}
 											{#if typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'))}
-												<img src={icon} alt="" class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<img src={icon} alt="" class="h-5 w-5 shrink-0" />
 											{:else if typeof icon === 'string'}
-												<Icon name={icon} className="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<Icon name={icon} className="h-5 w-5 shrink-0" />
 											{:else}
 												{@const IconC = asDynamicIcon(icon)}
-												<IconC class="h-5 w-5 {label ? 'mr-1.5' : ''}" />
+												<IconC class="h-5 w-5 shrink-0" />
 											{/if}
 										{/if}
 										{#if label}
@@ -757,7 +773,7 @@
 						{/each}
 
 						{#if authEnabled && isLoggedIn}
-							<li class="flex justify-center w-full border-b border-slate-600/30">
+							<li class="flex justify-center w-full border-b border-slate-600/30 relative">
 								<ActionsDropdown
 									title={userDropdownTitle}
 									formatKind={userDropdownFormatKind}

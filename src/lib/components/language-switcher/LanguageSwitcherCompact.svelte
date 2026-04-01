@@ -107,36 +107,54 @@
 	});
 </script>
 
-<!-- Language Button -->
+<!-- Language drill: same row order; RTL flex places last child (chevron) on physical left -->
 <button
+	type="button"
 	onclick={toggleSubmenu}
-	class="flex items-center justify-between w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8 {className}"
+	class="flex w-full flex-row items-center px-4 py-8 text-white transition-colors duration-200 hover:text-indigo-400 {className}"
 >
-	<div class="w-5"></div> <!-- Left spacer to balance the chevron -->
-	<div class="flex items-center justify-center flex-1">
+	<div class="w-11 shrink-0" aria-hidden="true"></div>
+	<div class="flex min-w-0 flex-1 items-center justify-center gap-2" dir="auto">
 		{#if icon}
-			<Icon name={icon} className="h-5 w-5 mr-1.5" />
+			<Icon name={icon} className="h-5 w-5 shrink-0" />
 		{/if}
-		<span>{title}</span>
+		<span class="text-center">{title}</span>
 	</div>
-	<ChevronRight className="h-5 w-5" />
+	<div class="flex w-11 shrink-0 items-center justify-center">
+		<ChevronRight class="h-5 w-5 shrink-0 ltr:block rtl:hidden" aria-hidden="true" />
+		<ChevronLeft class="hidden h-5 w-5 shrink-0 rtl:inline" aria-hidden="true" />
+	</div>
 </button>
 
 <!-- Language Submenu Overlay -->
 {#if showSubmenu}
 	<div class="fixed top-0 left-0 right-0 bottom-0 z-50 overflow-hidden" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Enter' && e.stopPropagation()} role="button" tabindex="0">
-		<div class="w-full h-full bg-gray-800 transition-transform duration-300 ease-out {slideDirection === 'enter' ? 'translate-x-0' : 'translate-x-full'}" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Enter' && e.stopPropagation()} role="button" tabindex="0">
+		<div
+			class="h-full w-full bg-gray-800 transition-transform duration-300 ease-out {slideDirection === 'enter'
+				? 'translate-x-0'
+				: 'translate-x-full rtl:-translate-x-full'}"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.key === 'Enter' && e.stopPropagation()}
+			role="button"
+			tabindex="0"
+		>
 			<div class="h-full overflow-y-auto" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Enter' && e.stopPropagation()} role="button" tabindex="0">
 				<ul class="flex flex-col text-xl">
 					<!-- Back Button -->
-					<li class="sticky top-0 z-20 bg-slate-900 flex justify-center border-b border-slate-600/30">
+					<li class="sticky top-0 z-20 flex justify-center border-b border-slate-600/30 bg-slate-900">
 						<button
-							onclick={(e) => { e.stopPropagation(); goBackToMainMenu(); }}
-							class="flex items-center justify-between w-full text-center text-white hover:text-indigo-400 transition-colors duration-200 px-4 py-8"
+							type="button"
+							onclick={(e) => {
+								e.stopPropagation();
+								goBackToMainMenu();
+							}}
+							class="grid w-full grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center px-4 py-8 [direction:ltr] text-white transition-colors duration-200 hover:text-indigo-400"
 						>
-							<ChevronLeft className="h-5 w-5" />
-							<span>Back</span>
-							<div class="w-5"></div> <!-- Spacer to balance the layout -->
+							<div class="flex w-full shrink-0 items-center justify-center">
+								<ChevronLeft class="h-5 w-5" aria-hidden="true" />
+							</div>
+							<span class="text-center" dir="auto">Back</span>
+							<div class="w-full shrink-0" aria-hidden="true"></div>
 						</button>
 					</li>
 

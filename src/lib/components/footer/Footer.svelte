@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import { ArrowUpRight, ChevronRight } from 'lucide-svelte';
+	import { page } from '$app/state';
+	import { ArrowUpLeft, ArrowUpRight, ChevronRight } from 'lucide-svelte';
 	import { Icon, Tooltip } from '$components';
 	import { Key } from 'lucide-svelte';
 	import { asDynamicIcon } from '$lib/helpers/icon';
@@ -96,8 +96,8 @@
 
 	// Parse URL and create breadcrumb segments
 	const pathSegments = $derived.by(() => {
-		if (!$page?.url) return [];
-		const path = $page.url.pathname;
+		if (!page?.url) return [];
+		const path = page.url.pathname;
 		const segments = path.split('/').filter((segment) => segment);
 		const result: { name: string; url: string; current: boolean }[] = [
 			{ name: t('footer.home', $LL), url: '/', current: segments.length === 0 }
@@ -138,7 +138,10 @@
 				{#each pathSegments as segment, index}
 					<li class="inline-flex items-center" aria-current={segment.current ? 'page' : undefined}>
 						{#if index > 0}
-							<ChevronRight class="h-5 w-5 text-gray-400 mx-2" />
+							<ChevronRight
+								class="h-5 w-5 shrink-0 text-gray-400 mx-2 rtl:rotate-180"
+								aria-hidden="true"
+							/>
 						{/if}
 						<a
 							href={segment.url}
@@ -157,27 +160,32 @@
 
 		<!-- Footer Links Section -->
 		{#if visibleLinks && visibleLinks.length > 0}
-			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4 mb-8 text-center sm:text-left">
+			<div
+				class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4 mb-8 text-center sm:text-start"
+			>
 				{#each visibleLinks as section}
-					<div class="text-center sm:text-left">
+					<div class="text-center sm:text-start">
 						<h4 class="text-lg font-semibold mb-2">
 							{t(section.title, $LL)}
 						</h4>
 						<ul class="space-y-2">
 							{#each section.items as item}
-								<li class="text-sm">
+								<li class="text-sm min-w-0">
 									{#if item.to}
-										<a href={item.to} class="hover:text-primary-600 transition duration-150 inline-block sm:inline">
+										<a
+											href={item.to}
+											class="hover:text-primary-600 transition duration-150 inline-flex max-w-full min-w-0 flex-nowrap items-center gap-1 text-start whitespace-nowrap"
+										>
 											{#if item.icon}
 												{#if typeof item.icon === 'string'}
-													<Icon name={item.icon} className="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+													<Icon name={item.icon} className="h-4 w-4 shrink-0" />
 												{:else}
 													{@const IconC = asDynamicIcon(item.icon)}
-													<IconC class="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+													<IconC class="h-4 w-4 shrink-0" />
 												{/if}
 											{/if}
 											{#if item.label}
-												{t(item.label, $LL)}
+												<span class="min-w-0">{t(item.label, $LL)}</span>
 											{/if}
 										</a>
 									{:else if item.href}
@@ -185,21 +193,22 @@
 											href={item.href}
 											target={item.target ? item.target : undefined}
 											rel={item.rel ? item.rel : undefined}
-											class="hover:text-primary-600 transition duration-150 inline-flex items-center justify-center sm:justify-start"
+											class="hover:text-primary-600 transition duration-150 inline-flex max-w-full min-w-0 flex-nowrap items-center justify-center gap-1.5 sm:justify-start"
 										>
 											{#if item.icon}
 												{#if typeof item.icon === 'string'}
-													<Icon name={item.icon} className="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+													<Icon name={item.icon} className="h-4 w-4 shrink-0" />
 												{:else}
 													{@const IconC = asDynamicIcon(item.icon)}
-													<IconC class="h-4 w-4 {item.label ? 'mr-1' : ''}" />
+													<IconC class="h-4 w-4 shrink-0" />
 												{/if}
 											{/if}
 											{#if item.label}
-												{t(item.label, $LL)}
+												<span class="min-w-0 text-start">{t(item.label, $LL)}</span>
 											{/if}
 											{#if typeof iconExternal === 'undefined' || iconExternal === true}
-												<ArrowUpRight class="h-4 w-4 ml-1" />
+												<ArrowUpRight class="h-4 w-4 shrink-0 rtl:hidden" aria-hidden="true" />
+												<ArrowUpLeft class="hidden h-4 w-4 shrink-0 rtl:inline" aria-hidden="true" />
 											{/if}
 										</a>
 									{/if}
@@ -211,7 +220,12 @@
 			</div>
 		{/if}
 
-		<div class="flex flex-col md:flex-row gap-4 items-center mb-2 mt-4">
+		<div
+			class="mb-2 mt-4 flex w-full flex-col items-center gap-4 md:flex-row md:items-center md:justify-between"
+		>
+			<div
+				class="flex min-w-0 flex-1 flex-col flex-wrap items-center gap-4 sm:flex-row sm:items-center"
+			>
 			{#if logo}
 				<a href="/" class="flex items-center mb-4 md:mb-0">
 					<img src={logo.src} alt={logo.alt} class="h-10" />
@@ -222,19 +236,21 @@
 					<h1 class="text-xl font-bold">{titleParts.brand}{titleParts.poweredBy ? ` | ${titleParts.poweredBy}` : ''}</h1>
 				</a>
 			{/if}
-			<div class="text-center text-sm text-footer-link">
-				{t(copyright || 'footer.copyright', $LL, { year: new Date().getFullYear() })}
+			<div class="text-center text-sm text-footer-link sm:text-start max-w-full">
+				<span dir="ltr" class="inline-block [unicode-bidi:isolate]">
+					{t(copyright || 'footer.copyright', $LL, { year: new Date().getFullYear() })}
+				</span>
 			</div>
 			{#if visibleLiner && visibleLiner.length > 0}
 				<div
-					class="flex flex-wrap justify-center text-sm md:justify-start gap-4 md:ml-4"
+					class="flex flex-wrap justify-center text-sm md:justify-start md:ms-4 gap-4"
 				>
 					{#each visibleLiner as { label, to, href, target, rel, className, icon, action }}
 						<div class="flex items-center">
 							{#if to}
 								<a
 									href={to}
-									class="hover:text-footer-link-hover inline-flex items-center gap-1 {className ?? ''}"
+									class="hover:text-footer-link-hover inline-flex max-w-full min-w-0 flex-nowrap items-center gap-1 {className ?? ''}"
 								>
 									{#if icon}
 										{#if typeof icon === 'string'}
@@ -245,7 +261,7 @@
 										{/if}
 									{/if}
 									{#if label}
-										<span class="whitespace-nowrap">{t(label, $LL)}</span>
+										<span class="min-w-0 whitespace-nowrap">{t(label, $LL)}</span>
 									{/if}
 								</a>
 							{:else if href}
@@ -253,21 +269,22 @@
 									{href}
 									target={target ? target : undefined}
 									rel={rel ? rel : undefined}
-									class="hover:text-footer-link-hover flex items-center {className}"
+									class="hover:text-footer-link-hover inline-flex max-w-full min-w-0 flex-nowrap items-center gap-1.5 {className}"
 								>
 									{#if icon}
 										{#if typeof icon === 'string'}
-											<Icon name={icon} className="h-4 w-4 {label ? 'mr-1' : ''}" />
+											<Icon name={icon} className="h-4 w-4 shrink-0" />
 										{:else}
 											{@const IconC = asDynamicIcon(icon)}
-											<IconC class="h-4 w-4 {label ? 'mr-1' : ''}" />
+											<IconC class="h-4 w-4 shrink-0" />
 										{/if}
 									{/if}
 									{#if label}
-										{t(label, $LL)}
+										<span class="min-w-0 whitespace-nowrap">{t(label, $LL)}</span>
 									{/if}
 									{#if typeof iconExternal === 'undefined' || iconExternal === true}
-										<ArrowUpRight class="h-4 w-4" />
+										<ArrowUpRight class="h-4 w-4 shrink-0 rtl:hidden" aria-hidden="true" />
+										<ArrowUpLeft class="hidden h-4 w-4 shrink-0 rtl:inline" aria-hidden="true" />
 									{/if}
 								</a>
 							{:else if action}
@@ -278,10 +295,10 @@
 								>
 									{#if icon}
 										{#if typeof icon === 'string'}
-											<Icon name={icon} className="h-4 w-4 {label ? 'mr-1' : ''}" />
+											<Icon name={icon} className="h-4 w-4 {label ? 'me-1' : ''}" />
 										{:else}
 											{@const IconC = asDynamicIcon(icon)}
-											<IconC class="h-4 w-4 {label ? 'mr-1' : ''}" />
+											<IconC class="h-4 w-4 {label ? 'me-1' : ''}" />
 										{/if}
 									{/if}
 									{#if label}
@@ -293,10 +310,13 @@
 					{/each}
 				</div>
 			{/if}
-			<div class="md:ml-auto flex items-center gap-4">
+			</div>
+			<div
+				class="flex flex-wrap items-center justify-center gap-4 md:justify-end rtl:md:justify-start shrink-0"
+			>
 				{#if authEnabled && isLoggedIn && authProviders.length > 0}
 					<div class="text-sm text-footer-link text-nowrap inline-flex items-center gap-1">
-						<Key class="h-4 w-4 mr-0.5 flex-shrink-0" />
+						<Key class="h-4 w-4 me-0.5 shrink-0" />
 						{#each authProviders as provider}
 							<Tooltip>
 								<button
@@ -319,13 +339,13 @@
 						{/each}
 					</div>
 				{/if}
-				<div class="flex items-center gap-2">
+				<div class="inline-flex items-center gap-2 leading-none">
 					<span
-						class="status-dot inline-block w-1.5 h-1.5 rounded-full {connectionStatus
+						class="status-dot inline-block shrink-0 w-1.5 h-1.5 rounded-full {connectionStatus
 							? 'connected'
 							: ''}"
 					></span>
-					<p class="text-sm text-footer-link text-nowrap">{_cfg?.language?.enabled ? (connectionStatus ? t('common.online', $LL) : t('common.offline', $LL)) : (connectionStatus ? 'Online' : 'Offline')}</p>
+					<span class="text-sm text-footer-link text-nowrap">{_cfg?.language?.enabled ? (connectionStatus ? t('common.online', $LL) : t('common.offline', $LL)) : (connectionStatus ? 'Online' : 'Offline')}</span>
 				</div>
 			</div>
 		</div>
