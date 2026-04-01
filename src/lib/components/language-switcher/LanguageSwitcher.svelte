@@ -3,12 +3,11 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
-	import { Icon } from '$components';
+	import { Icon } from '$lib/components';
 	import { onMount } from 'svelte';
-	import { applyLocale, pathWithLocale } from '$lib/helpers/i18n';
+	import { applyLocale } from '$lib/helpers/i18n';
 	import { getStoredLocale } from '$lib/helpers/storageKeys';
 	import { getSiteConfig } from '$lib/helpers/siteConfig';
-	import { locale as localeStore } from '$lib/helpers/i18n';
 
 	let {
 		currentLocale = 'en',
@@ -17,7 +16,8 @@
 		addIcons = false,
 		className = '',
 		orientation = 'horizontal',
-		theme = 'blur'
+		theme = 'blur',
+		dropdownPosition = 'below'
 	}: {
 		currentLocale?: string;
 		availableLocales?: Array<{ code: string; name: string; icon?: string }>;
@@ -26,40 +26,66 @@
 		className?: string;
 		orientation?: 'horizontal' | 'vertical';
 		theme?: 'auto' | 'blur' | 'transparent';
+		dropdownPosition?: 'above' | 'below';
 	} = $props();
 
 	let isOpen = $state(false);
 	let dropdownRef: HTMLDivElement;
 
-	// Use i18n locale store so selection persists across navigations (not just page.data.locale)
-	const actualCurrentLocale = $derived($localeStore ?? currentLocale);
+	/** Mutable UI locale; syncs from prop + localStorage when `currentLocale` changes (no prop in $state initializer). */
+	let actualCurrentLocale = $state('');
 
-	// When storage changes (e.g. another tab), apply so this tab’s locale store updates
-	function updateCurrentLocale() {
-		if (browser) {
-			const stored = getStoredLocale();
-			if (stored) applyLocale(stored);
+	$effect.pre(() => {
+		if (!browser) {
+			actualCurrentLocale = currentLocale;
+			return;
 		}
+		const stored = getStoredLocale();
+		actualCurrentLocale = stored || currentLocale;
+	});
+
+	function syncLocaleFromStorage() {
+		if (!browser) return;
+		const stored = getStoredLocale();
+		actualCurrentLocale = stored || currentLocale;
 	}
 
 	// Get current language name
-	const currentLanguageName = $derived(availableLocales.find(locale => locale.code === actualCurrentLocale)?.name || actualCurrentLocale.toUpperCase());
+	const currentLanguageName = $derived(
+		availableLocales.find((locale) => locale.code === actualCurrentLocale)?.name ||
+			actualCurrentLocale.toUpperCase()
+	);
 
 	// Sort languages with current locale first
 	const sortedLocales = $derived([
-		...availableLocales.filter(locale => locale.code === actualCurrentLocale),
-		...availableLocales.filter(locale => locale.code !== actualCurrentLocale)
+		...availableLocales.filter((locale) => locale.code === actualCurrentLocale),
+		...availableLocales.filter((locale) => locale.code !== actualCurrentLocale)
 	]);
 
 	// Handle language change
 	async function changeLanguage(locale: string) {
 		if (locale === actualCurrentLocale) return;
 
-		// Use i18n helper to apply locale (updates locale store; UI follows)
+		// Use i18n helper to apply locale
 		await applyLocale(locale);
 
-		// Update URL: always strip any locale in the first segment, then prepend new one (locale only in first position).
-		const newPath = pathWithLocale(page.url.pathname, locale, defaultLocale);
+		// Update current locale immediately
+		actualCurrentLocale = locale;
+
+		// Update URL
+		const currentPath = page.url.pathname;
+		let newPath: string = currentPath;
+
+		// Remove current locale from path if it exists
+		const pathHasLocale = currentPath.match(/^\/[a-z]{2}(?:\/|$)/);
+		if (pathHasLocale) {
+			newPath = currentPath.replace(/^\/[a-z]{2}/, '') || '/';
+		}
+
+		// Add new locale to path if it's not the default
+		if (locale !== defaultLocale) {
+			newPath = `/${locale}${newPath}`;
+		}
 
 		// Navigate to new path
 		await goto(newPath as any, { replaceState: true });
@@ -78,16 +104,14 @@
 	onMount(() => {
 		document.addEventListener('click', handleClickOutside);
 
-		// Listen for storage changes and initial load
 		if (browser) {
-			window.addEventListener('storage', updateCurrentLocale);
-			updateCurrentLocale(); // Initial load
+			window.addEventListener('storage', syncLocaleFromStorage);
 		}
 
 		return () => {
 			document.removeEventListener('click', handleClickOutside);
 			if (browser) {
-				window.removeEventListener('storage', updateCurrentLocale);
+				window.removeEventListener('storage', syncLocaleFromStorage);
 			}
 		};
 	});
@@ -102,8 +126,8 @@
 		aria-haspopup="true"
 	>
 		<Icon name="languages" />
-        {#if (getSiteConfig()?.language as { showName?: boolean } | undefined)?.showName}
-		    <span class="whitespace-nowrap">{currentLanguageName}</span>
+		{#if (getSiteConfig()?.language as { showName?: boolean } | undefined)?.showName}
+			<span class="whitespace-nowrap">{currentLanguageName}</span>
 		{/if}
 		{#if orientation === 'vertical'}
 			<ChevronRight class="w-3 h-3 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}" />
@@ -112,27 +136,33 @@
 		{/if}
 	</button>
 
-		<!-- Dropdown Menu -->
-		{#if isOpen}
-			<div class="absolute {orientation === 'vertical' ? 'left-full top-0 ml-2' : 'right-0 mt-2'} w-56 bg-slate-800 rounded-lg shadow-lg border border-slate-700 z-50 max-h-80 overflow-hidden">
-				<div class="max-h-80 overflow-y-auto">
-					{#each sortedLocales as locale}
-						<button
-							onclick={() => changeLanguage(locale.code)}
-							class="w-full px-4 py-2 text-left text-slate-300 hover:bg-slate-700 transition-colors duration-200 flex items-center justify-between gap-2 {locale.code === actualCurrentLocale ? 'bg-slate-700 font-medium' : ''}"
-						>
-							<span class="flex items-center gap-2">
-								{#if addIcons && locale.icon}
-									<span class="text-lg leading-none" aria-hidden="true">{locale.icon}</span>
-								{/if}
-								{locale.name}
-							</span>
-							{#if locale.code === actualCurrentLocale}
-								<div class="w-2 h-2 bg-indigo-500 rounded-full shrink-0"></div>
+	<!-- Dropdown Menu -->
+	{#if isOpen}
+		<div
+			class="absolute w-56 bg-slate-800 rounded-lg shadow-lg border border-slate-700 z-50 max-h-80 overflow-hidden {orientation === 'vertical'
+				? 'left-full top-0 ml-2'
+				: dropdownPosition === 'above'
+					? 'end-0 bottom-full mb-2'
+					: 'end-0 mt-2'}"
+		>
+			<div class="max-h-80 overflow-y-auto">
+				{#each sortedLocales as locale}
+					<button
+						onclick={() => changeLanguage(locale.code)}
+						class="w-full px-4 py-2 text-start text-slate-300 hover:bg-slate-700 transition-colors duration-200 flex items-center justify-between gap-2 {locale.code === actualCurrentLocale ? 'bg-slate-700 font-medium' : ''}"
+					>
+						<span class="flex items-center gap-2">
+							{#if addIcons && locale.icon}
+								<span class="text-lg leading-none" aria-hidden="true">{locale.icon}</span>
 							{/if}
-						</button>
-					{/each}
-				</div>
+							{locale.name}
+						</span>
+						{#if locale.code === actualCurrentLocale}
+							<div class="w-2 h-2 bg-indigo-500 rounded-full shrink-0"></div>
+						{/if}
+					</button>
+				{/each}
 			</div>
-		{/if}
+		</div>
+	{/if}
 </div>

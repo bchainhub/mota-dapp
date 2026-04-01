@@ -2,6 +2,8 @@ import { browser } from '$app/environment';
 import { get, writable, type Writable } from 'svelte/store';
 import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
 import { getSiteConfig } from '$lib/helpers/siteConfig';
+import { isLocale, loadedLocales } from '../../i18n/i18n-util';
+import type { Locales } from '../../i18n/i18n-types';
 
 const config = getSiteConfig()?.language;
 
@@ -236,12 +238,22 @@ export const getLocale = (): string => {
 };
 
 // set the active locale for $LL (and persist in localStorage on browser)
-// - When enabled: loads typesafe-i18n locale, updates locale + LL stores so t() returns translations
-// - When disabled: no-op
+// - Ensures base + active dictionaries are loaded on the client before switching
+// - Uses i18n-svelte.setLocale() to reactively update $LL everywhere
 export const applyLocale = async (localeToApply: string) => {
 	if (!config?.enabled) return;
 
-	if (browser) setStoredLocale(localeToApply);
+	if (browser) {
+		try {
+			const { loadLocaleAsync: loadAsync } = await import('../../i18n/i18n-util.async');
+			await loadAsync(localeToApply as any);
+		} catch {
+			// i18n-util.async not available
+		}
+		setStoredLocale(localeToApply);
+	}
+
+	// Update local locale store (used by LanguageSwitcher via $localeStore)
 	setLocale(localeToApply);
 
 	if (!browser) return;
@@ -356,4 +368,40 @@ export function t(key: string, LL: Record<string, any>, vars?: Vars): string {
 
 	// anything unexpected -> key fallback
 	return key;
+}
+
+/** Like t() but returns null instead of the key when the translation is missing. Useful for optional translations (e.g. currency names). */
+export function torNot(key: string, LL: Record<string, any>, vars?: Vars): string | null {
+	let cur: any = LL;
+	for (const part of key.split('.')) {
+		if (cur && part in cur) cur = cur[part];
+		else return null;
+	}
+
+	if (typeof cur === 'function') {
+		return cur(vars);
+	}
+
+	if (typeof cur === 'string') {
+		if (vars) {
+			let out = cur;
+			for (const [k, v] of Object.entries(vars)) {
+				out = out.replace(new RegExp(`\\{${k}\\}`, 'g'), v == null ? '' : String(v));
+			}
+			return out;
+		}
+		return cur;
+	}
+
+	return null;
+}
+
+/**
+ * RTL from each locale `language.rtl` in locale index files (`'true'` / `'false'`).
+ * Call `loadLocale` from `i18n-util.sync` before this if the dictionary may not be loaded yet.
+ * Unknown or missing value is treated as LTR (`false`).
+ */
+export function isRtlLocale(locale: string): boolean {
+	if (!isLocale(locale)) return false;
+	return loadedLocales[locale as Locales]?.language?.rtl === 'true';
 }
