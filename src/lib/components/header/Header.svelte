@@ -382,7 +382,7 @@
 					{#if logo.attachTitle && _cfg?.title}
 						{@const titleParts = getSiteTitleParts(_cfg)}
 						<span
-							class={`truncate text-base font-semibold ${logo.className ? '' : style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}`}
+							class={`truncate ${logo.className ? '' : style === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : style === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}`}
 						>
 							{titleParts.brand}
 						</span>
@@ -613,9 +613,6 @@
 								{orientation}
 								onChange={handleSelect}
 							/>
-							{#if isEnriched}
-								<span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-slate-800 dark:border-slate-900" title="Verified with CorePass"></span>
-							{/if}
 						</div>
 					{/if}
 					<!-- Language Switcher -->
