@@ -135,7 +135,7 @@ export default defineConfig({
 		}
 	},
 	plugins: [
-		resolveExtensionlessPlugin(),
+		resolveExtensionlessPlugin(projectRoot),
 		tailwindcss(),
 		sveltekit(),
 		VitePWA({
