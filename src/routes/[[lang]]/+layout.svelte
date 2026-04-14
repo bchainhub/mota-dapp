@@ -22,7 +22,10 @@
 	const { themeConfig, language, title, favicon } = cfg;
 	const _theme = themeConfig ?? {};
 	const { metadata, navbar } = _theme;
-	const metaList = metadata ?? [];
+	const metaList = (metadata ?? []) as (
+		| { name?: string; content: string; property?: string }
+		| { rel: string; href: string }
+	)[];
 
 	const enabled = language?.enabled || false;
 
@@ -107,13 +110,17 @@
 		<link rel="icon" href={favicon} type="image/png" />
 	{/if}
 	{#if metaList.length}
-		{#each metaList as { name, content, property }}
-			{@const metaContent = t(content, $LL)}
-			{#if name}
-				<meta {name} content={metaContent} />
-			{/if}
-			{#if property}
-				<meta {property} content={metaContent} />
+		{#each metaList as item}
+			{#if 'rel' in item}
+				<link rel={item.rel} href={item.href} />
+			{:else}
+				{@const metaContent = t(item.content, $LL)}
+				{#if item.name}
+					<meta name={item.name} content={metaContent} />
+				{/if}
+				{#if item.property}
+					<meta property={item.property} content={metaContent} />
+				{/if}
 			{/if}
 		{/each}
 	{/if}
