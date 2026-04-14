@@ -137,9 +137,9 @@ declare module 'vite-plugin-config' {
 			};
 			/**
 			 * metadata
-			 * @description HTML meta tags: name?, content, property? (for SEO, OG, etc.).
+			 * @description HTML `<meta>` tags (`name` / `property` + `content`) or `<link>` (`rel` + `href`).
 			 */
-			metadata?: { name?: string; content: string; property?: string }[];
+			metadata?: ({ name?: string; content: string; property?: string } | { rel?: string; href?: string })[];
 			/**
 			 * colorMode
 			 * @description Color / dark mode: default, toggle visibility, system preference.
