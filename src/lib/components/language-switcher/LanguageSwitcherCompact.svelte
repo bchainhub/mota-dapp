@@ -15,7 +15,6 @@
 		items = [],
 		onback,
 		onselect,
-		iconExternal = true,
 		className = ''
 	}: {
 		title?: string;
@@ -28,7 +27,6 @@
 		}>;
 		onback?: () => void;
 		onselect?: (item: any) => void;
-		iconExternal?: boolean;
 		className?: string;
 	} = $props();
 
@@ -68,10 +66,8 @@
 
 	const goBackToMainMenu = () => {
 		slideDirection = 'exit';
-		isAnimating = true;
 		setTimeout(() => {
 			showSubmenu = false;
-			isAnimating = false;
 			onback?.();
 		}, 300);
 	};
@@ -89,10 +85,8 @@
 
 		onselect?.(item);
 		slideDirection = 'exit';
-		isAnimating = true;
 		setTimeout(() => {
 			showSubmenu = false;
-			isAnimating = false;
 		}, 300);
 	};
 
