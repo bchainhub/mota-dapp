@@ -17,7 +17,8 @@
 		className = '',
 		orientation = 'horizontal',
 		theme = 'blur',
-		dropdownPosition = 'below'
+		dropdownPosition = 'below',
+		icon = 'languages'
 	}: {
 		currentLocale?: string;
 		availableLocales?: Array<{ code: string; name: string; icon?: string }>;
@@ -27,6 +28,7 @@
 		orientation?: 'horizontal' | 'vertical';
 		theme?: 'auto' | 'blur' | 'transparent';
 		dropdownPosition?: 'above' | 'below';
+		icon?: string;
 	} = $props();
 
 	let isOpen = $state(false);
@@ -125,7 +127,9 @@
 		aria-expanded={isOpen}
 		aria-haspopup="true"
 	>
-		<Icon name="languages" />
+		{#if icon}
+			<Icon name={icon} className="w-5 h-5" />
+		{/if}
 		{#if (getSiteConfig()?.language as { showName?: boolean } | undefined)?.showName}
 			<span class="whitespace-nowrap">{currentLanguageName}</span>
 		{/if}
