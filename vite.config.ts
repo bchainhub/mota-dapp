@@ -5,7 +5,6 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import type { Config } from 'vite-plugin-config';
 import tailwindcss from '@tailwindcss/vite';
-import { resolveExtensionlessPlugin } from './src/lib/helpers/vite-resolve-extensionless';
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -133,7 +132,6 @@ export default defineConfig({
 		}
 	},
 	plugins: [
-		resolveExtensionlessPlugin(projectRoot),
 		tailwindcss(),
 		sveltekit(),
 		VitePWA({
