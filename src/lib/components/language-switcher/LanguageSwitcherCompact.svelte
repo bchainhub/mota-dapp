@@ -34,7 +34,6 @@
 
 	let showSubmenu = $state(false);
 	let currentLocale = $state<string | null>(null);
-	let isAnimating = $state(false);
 	let slideDirection = $state<'enter' | 'exit'>('exit');
 
 	// Update current locale from i18n helpers

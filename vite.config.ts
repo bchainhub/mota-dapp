@@ -1,6 +1,4 @@
-// @ts-expect-error
 import path from 'node:path';
-// @ts-expect-error
 import { fileURLToPath } from 'node:url';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
@@ -53,7 +51,7 @@ const siteConfigClient: Config = {
 					label: 'navbar.home',
 					to: '/',
 					position: 'left',
-					icon: 'home'
+					icon: 'house'
 				},
 				{
 					href: 'https://github.com/bchainhub/dapp-starter',
