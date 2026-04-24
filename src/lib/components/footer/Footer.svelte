@@ -174,6 +174,8 @@
 									{#if item.to}
 										<a
 											href={item.to}
+											target={item.target ? item.target : undefined}
+											rel={item.rel ? item.rel : undefined}
 											class="hover:text-primary-600 transition duration-150 inline-flex max-w-full min-w-0 flex-nowrap items-center gap-1 text-start whitespace-nowrap"
 										>
 											{#if item.icon}
@@ -250,6 +252,8 @@
 							{#if to}
 								<a
 									href={to}
+									target={target ? target : undefined}
+									rel={rel ? rel : undefined}
 									class="hover:text-footer-link-hover inline-flex max-w-full min-w-0 flex-nowrap items-center gap-1 {className ?? ''}"
 								>
 									{#if icon}

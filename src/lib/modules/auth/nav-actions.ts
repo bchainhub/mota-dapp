@@ -50,10 +50,10 @@ export function getAuthProvider(
 }
 
 /** Navbar items from site config (parsed). Use for show: 'loggedIn'/'loggedOut' to apply. */
-export function getNavbarItemsFromConfig(): Array<{ show?: string; label?: string; to?: string; href?: string; action?: string; position?: string; icon?: string; className?: string; submenu?: unknown[] }> {
+export function getNavbarItemsFromConfig(): Array<{ show?: string; label?: string; to?: string; href?: string; target?: '_blank' | '_self' | '_parent' | '_top'; rel?: string; action?: string; position?: string; icon?: string; className?: string; submenu?: unknown[] }> {
 	const c = getSiteConfig();
 	const items = (c?.themeConfig as { navbar?: { items?: unknown[] } })?.navbar?.items;
-	return Array.isArray(items) ? items as Array<{ show?: string; label?: string; to?: string; href?: string; action?: string; position?: string; icon?: string; className?: string; submenu?: unknown[] }> : [];
+	return Array.isArray(items) ? items as Array<{ show?: string; label?: string; to?: string; href?: string; target?: '_blank' | '_self' | '_parent' | '_top'; rel?: string; action?: string; position?: string; icon?: string; className?: string; submenu?: unknown[] }> : [];
 }
 
 /** Auth item for dropdown; optional show rule (e.g. "loggedIn", "connected", "loggedIn and connected"). */
@@ -61,6 +61,8 @@ export type AuthItemFromConfig = {
 	label?: string;
 	to?: string;
 	href?: string;
+	target?: '_blank' | '_self' | '_parent' | '_top';
+	rel?: string;
 	icon?: string;
 	show?: string;
 	className?: string;

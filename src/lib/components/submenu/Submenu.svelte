@@ -39,6 +39,7 @@
 	let dropdownRef: HTMLDivElement;
 
 	const handleItemClick = (item: any) => {
+		isOpen = false;
 		onselect?.(item);
 		onback?.();
 	};
