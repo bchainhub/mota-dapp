@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
-	import { ArrowUpLeft, ArrowUpRight, Eclipse, Menu, Moon, Sun, X } from 'lucide-svelte';
+	import { ArrowUpLeft, ArrowUpRight, Eclipse, Menu, Moon, Sun, X } from '@lucide/svelte';
 	import { ActionsDropdown, Icon, LanguageSwitcher, LanguageSwitcherCompact, Submenu, SubmenuCompact } from '$components';
 	import { asDynamicIcon } from '$lib/helpers/icon';
 	import { LL, locale as localeStore } from '$lib/helpers/i18n';

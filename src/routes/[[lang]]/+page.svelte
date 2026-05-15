@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Brain, Bot, BookSearch, Box, Code, Plug, Scroll } from 'lucide-svelte';
+	import { Brain, Bot, BookSearch, Box, Code, Plug, Scroll } from '@lucide/svelte';
 </script>
 
 <div class="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 py-16">

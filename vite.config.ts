@@ -172,6 +172,6 @@ export default defineConfig({
 		'import.meta.env.DEV': process.env.DEV_MODE === '1'
 	},
 	ssr: {
-		noExternal: ['lucide-svelte']
+		noExternal: ['@lucide/svelte']
 	}
 });

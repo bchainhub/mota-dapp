@@ -38,7 +38,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { toasts, toast } from './toastStore';
-	import { X } from 'lucide-svelte';
+	import { X } from '@lucide/svelte';
 
 	function handleMouseEnter(id: string) {
 		toast.pause(id);

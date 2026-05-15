@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowRight, House, CircleAlert, MessageCircleQuestionMark, LifeBuoy } from 'lucide-svelte';
+	import { ArrowRight, House, CircleAlert, MessageCircleQuestionMark, LifeBuoy } from '@lucide/svelte';
 	import { page } from '$app/state';
 	import { getSiteConfig } from '$lib/helpers/siteConfig';
 

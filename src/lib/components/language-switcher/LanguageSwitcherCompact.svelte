@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
 	import { Icon } from '$components';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';

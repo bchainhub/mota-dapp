@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { ChevronDown, ChevronRight } from 'lucide-svelte';
+	import { ChevronDown, ChevronRight } from '@lucide/svelte';
 	import { Icon } from '$lib/components';
 	import { onMount } from 'svelte';
 	import { applyLocale } from '$lib/helpers/i18n';

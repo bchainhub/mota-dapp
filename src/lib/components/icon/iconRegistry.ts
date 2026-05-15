@@ -1,5 +1,5 @@
 import type { Component } from 'svelte';
-import { House, Languages } from 'lucide-svelte';
+import { House, Languages } from '@lucide/svelte';
 
 /**
  * Keys: lowercase kebab-case Lucide stems. Config `icon` must use the same.
