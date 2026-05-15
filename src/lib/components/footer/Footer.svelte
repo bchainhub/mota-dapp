@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import { ArrowUpLeft, ArrowUpRight, ChevronRight } from 'lucide-svelte';
+	import { ArrowUpLeft, ArrowUpRight, ChevronRight } from '@lucide/svelte';
 	import { Icon, Tooltip } from '$components';
-	import { Key } from 'lucide-svelte';
+	import { Key } from '@lucide/svelte';
 	import { asDynamicIcon } from '$lib/helpers/icon';
 	import { LL } from '$lib/helpers/i18n';
 	import { t } from '$lib/helpers/i18n';

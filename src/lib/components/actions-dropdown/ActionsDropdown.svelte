@@ -4,7 +4,7 @@
 	import { LL, t } from '$lib/helpers/i18n';
 	import { Icon } from '$components';
 	import { asDynamicIcon } from '$lib/helpers/icon';
-	import { ArrowUpLeft, ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Key, Wallet } from 'lucide-svelte';
+	import { ArrowUpLeft, ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Key, Wallet } from '@lucide/svelte';
 	import { blo } from '@blockchainhub/blo';
 	import { shortFormat, type ShortFormatKind } from '$lib/helpers/shortFormat';
 

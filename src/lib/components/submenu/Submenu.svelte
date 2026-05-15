@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Icon } from '$components';
 	import { asDynamicIcon } from '$lib/helpers/icon';
-	import { ArrowUpLeft, ArrowUpRight, ChevronDown, ChevronRight } from 'lucide-svelte';
+	import { ArrowUpLeft, ArrowUpRight, ChevronDown, ChevronRight } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 
 	type NavIcon = string | import('svelte').Component | (new (...args: any[]) => unknown);
