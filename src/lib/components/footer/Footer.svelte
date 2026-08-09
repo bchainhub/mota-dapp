@@ -5,8 +5,7 @@
 	import { Icon, Tooltip } from '$components';
 	import { Key } from '@lucide/svelte';
 	import { asDynamicIcon } from '$lib/helpers/icon';
-	import { LL } from '$lib/helpers/i18n';
-	import { t } from '$lib/helpers/i18n';
+	import { LL, t, torNot } from '$lib/helpers/i18n';
 	import { walletAddress } from '$modules/auth/web3';
 	import {
 		getAuthNavActions,
@@ -34,6 +33,21 @@
 	const authIn = $derived(Boolean(session?.user));
 	const showContext = $derived({ loggedIn: isLoggedIn, connected, authIn });
 	const authProviders = $derived(getAuthProviders(session, $walletAddress));
+
+	function authProviderLabel(provider: string): string {
+		if (provider.toLowerCase() === 'passkey') {
+			return torNot('content.footerExtras.brands.passkey', $LL) ?? 'Passkey';
+		}
+		return provider.charAt(0).toUpperCase() + provider.slice(1);
+	}
+
+	function disconnectLabel(): string {
+		return (
+			torNot('content.footerExtras.disconnectPasskey', $LL) ??
+			torNot('navbar.disconnect', $LL) ??
+			'Disconnect'
+		);
+	}
 
 	/** Filter by show only when auth enabled; otherwise show all. */
 	const visibleLinks = $derived(
@@ -331,10 +345,10 @@
 										else authNavActions.signout();
 									}}
 								>
-									{provider.charAt(0).toUpperCase() + provider.slice(1)}
+									{authProviderLabel(provider)}
 								</button>
 								<svelte:fragment slot="content">
-									Disconnect {provider.charAt(0).toUpperCase() + provider.slice(1)}
+									{disconnectLabel()} {authProviderLabel(provider)}
 								</svelte:fragment>
 							</Tooltip>
 							{#if authProviders.indexOf(provider) < authProviders.length - 1}
