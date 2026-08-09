@@ -103,19 +103,25 @@
 		filterNavItemsByAuth(items as import('$lib/helpers/nav').ItemWithShow[], showContext, authEnabled) as NavbarItem[]
 	);
 
-	/** Display label for the user dropdown: wallet address or passkey session user; fallback to translated Account when no name. */
-	const userDropdownTitle = $derived(
-		$walletAddress ??
+	/** Display label for the user dropdown: wallet, Core ID, or passkey user fields. */
+	const userDropdownTitle = $derived.by((): string => {
+		if ($walletAddress) return $walletAddress;
+		const profileCoreId = (session?.user?.profile as { coreId?: string } | undefined)?.coreId?.trim();
+		if (profileCoreId) return profileCoreId;
+		return (
 			session?.user?.name ??
 			session?.user?.email ??
 			(session?.user?.id != null || session?.user?.userId != null
 				? String(session.user.id ?? session.user.userId).slice(0, 12) + '…'
 				: null) ??
 			t('common.account', $LL)
-	);
-	/** Format kind for shortFormat: Core Blockchain (wallet CorePass) = "core", other wallet = "wallet". */
+		);
+	});
+	/** Core IDs and Core ecosystem wallets use the Core short format. */
 	const userDropdownFormatKind = $derived.by((): ShortFormatKind => {
 		if ($walletAddress) return isCoreEcosystem($walletType) ? 'core' : 'wallet';
+		const profileCoreId = (session?.user?.profile as { coreId?: string } | undefined)?.coreId?.trim();
+		if (profileCoreId) return 'core';
 		return 'user';
 	});
 	/** Icon for dropdown: Wallet when connected, Key when logged in only. Wallet wins when both. */
@@ -157,7 +163,12 @@
 			className: item.className,
 			icon: item.icon
 		}));
-		const logoutItem: MenuItem = { label: t('common.logout', $LL), className: undefined, icon: undefined, action: () => Promise.resolve(authNavActions.signout()) };
+		const logoutItem: MenuItem = {
+			label: t('common.logout', $LL),
+			className: undefined,
+			icon: 'log-out',
+			action: () => Promise.resolve(authNavActions.signout())
+		};
 		const disconnectItem: MenuItem = { label: t('navbar.disconnect', $LL), className: undefined, icon: undefined, action: () => Promise.resolve(authNavActions.disconnect()) };
 		const dashboardItem: MenuItem | null = session?.user ? { label: t('content.dashboard.heading', $LL), to: '/dashboard', className: undefined, icon: undefined, action: () => goto('/dashboard') } : null;
 		const items: MenuItem[] = [...(dashboardItem ? [dashboardItem] : []), ...authMenuItems];

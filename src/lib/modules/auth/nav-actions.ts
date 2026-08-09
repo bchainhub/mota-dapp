@@ -6,7 +6,13 @@ import { connectWallet, disconnectWallet } from './web3';
 
 type AuthConfig = { enabled?: boolean; strategy?: string | string[]; primaryStrategy?: string };
 type SessionLike = {
-	user?: { id?: string; userId?: string; name?: string | null; email?: string | null };
+	user?: {
+		id?: string;
+		userId?: string;
+		name?: string | null;
+		email?: string | null;
+		profile?: { coreId?: string } | object;
+	};
 	provider?: string;
 } | null | undefined;
 
@@ -36,7 +42,7 @@ export function getAuthProviders(
 ): string[] {
 	const out: string[] = [];
 	if (session != null && session.user != null) out.push(session.provider ?? 'passkey');
-	if (walletAddress) out.push('web3');
+	if (walletAddress && !out.includes('web3')) out.push('web3');
 	return out;
 }
 
