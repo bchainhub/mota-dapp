@@ -161,7 +161,8 @@
 			target: item.target as MenuItem['target'],
 			rel: item.rel,
 			className: item.className,
-			icon: item.icon
+			icon: item.icon,
+			action: item.action ? () => Promise.resolve(resolveAuthNavAction(item.action, authNavActions)?.()) : undefined
 		}));
 		const logoutItem: MenuItem = {
 			label: t('common.logout', $LL),
@@ -173,7 +174,7 @@
 		const dashboardItem: MenuItem | null = session?.user ? { label: t('content.dashboard.heading', $LL), to: '/dashboard', className: undefined, icon: undefined, action: () => goto('/dashboard') } : null;
 		const items: MenuItem[] = [...(dashboardItem ? [dashboardItem] : []), ...authMenuItems];
 		if (authEnabled && web3Enabled && $walletAddress) items.push(disconnectItem);
-		if (session?.user) items.push(logoutItem);
+		if (session?.user && !authItems.some((item) => item.action === 'signout' || item.action === 'logout')) items.push(logoutItem);
 		return items;
 	});
 
