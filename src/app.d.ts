@@ -204,6 +204,8 @@ declare module 'vite-plugin-config' {
 			 * @description Auth and wallet. When enabled, navbar/footer show connect, disconnect, signin, signout.
 			 */
 			auth?: {
+				/** Addons may extend authentication configuration without editing this central declaration. */
+				[key: string]: unknown;
 				/**
 				 * enabled
 				 * @description Enable auth UI (connect, disconnect, signin, signout in navbar/footer).
@@ -226,171 +228,12 @@ declare module 'vite-plugin-config' {
 				primaryStrategy?: string;
 
 				/**
-				 * passkey
-				 * @description Passkey (WebAuthn / CorePass) configuration for Better Auth + better-auth-corepass-passkey. Database is set at auth level (e.g. D1 in hooks), not here.
-				 * @see https://better-auth.com/docs/plugins/passkey
-				 * @see better-auth-corepass-passkey (npm)
-				 */
-				passkey?: {
-					/**
-					 * route
-					 * @description Passkey auth base path (e.g. /auth). Used by Better Auth and hooks to route /auth/*. Default '/auth' when omitted. `/passkey/data` is served at exactly /passkey/data (HEAD = verify active, POST = receive data from CorePass; no GET).
-					 * @example "/auth"
-					 */
-					route?: string;
-					/**
-					 * database
-					 * @description Auth DB type for Better Auth. Connector (D1) and URL (others) stay in private env.
-					 * @values `'d1'` | `'sqlite'` | `'postgres'` | `'mysql'`
-					 */
-					database?: 'd1' | 'sqlite' | 'postgres' | 'mysql';
-					/**
-					 * authenticatorAttachment
-					 * @description Preferred authenticator attachment. Passed to @better-auth/passkey.
-					 * @values `'platform'` (device-bound) | `'cross-platform'` (roaming, e.g. security key)
-					 * @recommendation Omit or use both; `platform` for best UX on mobile.
-					 */
-					authenticatorAttachment?: 'platform' | 'cross-platform';
-					/**
-					 * origin
-					 * @description Relying party origin (e.g. site origin for WebAuthn). Must match deployment origin.
-					 */
-					origin?: string;
-					/**
-					 * residentKey
-					 * @description Resident (discoverable) key preference. Passed to @better-auth/passkey.
-					 * @values `'required'` | `'preferred'` | `'discouraged'`
-					 * @recommendation `preferred` for passkey-style UX (no username required).
-					 */
-					residentKey?: 'required' | 'preferred' | 'discouraged';
-					/**
-					 * rpId
-					 * @description Relying party ID (hostname); passed to plugin as rpID. Defaults to origin host when omitted.
-					 */
-					rpId?: string;
-					/**
-					 * rpName
-					 * @description Relying party display name (shown in browser passkey prompt).
-					 */
-					rpName?: string;
-					/**
-					 * userVerification
-					 * @description User verification requirement (e.g. PIN, biometric). Passed to @better-auth/passkey.
-					 * @values `'required'` | `'preferred'` | `'discouraged'`
-					 * @recommendation `preferred` or `required` for security.
-					 */
-					userVerification?: 'required' | 'preferred' | 'discouraged';
-					/**
-					 * sessionMaxAge
-					 * @description Better Auth session max age in seconds (session.expiresIn).
-					 * @recommendation Default 7 days (604800); 30 days (2592000) for longer sessions.
-					 */
-					sessionMaxAge?: number;
-					/**
-					 * requireEmail
-					 * @description Require email in enrichment payload only (userData.email in POST /passkey/data). Validated with regex. Default false. On failure after signature verification, user and sessions are deleted.
-					 */
-					requireEmail?: boolean;
-					/**
-					 * requireRegistrationEmail
-					 * @description Require email from the registration form (user must have provided email when registering). Default false. If missing when they have a passkey, account is cleaned and 403 EMAIL_REQUIRED.
-					 */
-					requireRegistrationEmail?: boolean;
-					/**
-					 * requireAtLeastOneEmail
-					 * @description Require email from registration or enrichment (enrichment overwrites if provided). Non-verified (registration) allowed. Default false. If neither provided, fail and clean (enrichment) or 403 and clean (access).
-					 */
-					requireAtLeastOneEmail?: boolean;
-					/**
-					 * finalize
-					 * @description When the user becomes active: 'immediate' right after passkey registration; 'after' when enrichment is received. Default 'after'.
-					 */
-					finalize?: 'immediate' | 'after';
-					/**
-					 * signaturePath
-					 * @description Path used when building the signature input string. Default '/passkey/data'.
-					 */
-					signaturePath?: string;
-					/**
-					 * timestampWindowMs
-					 * @description Allowed clock skew for enrichment timestamp (milliseconds). Default 600_000. Passed to plugin as timestampWindowMs.
-					 */
-					timestampWindowMs?: number;
-					/**
-					 * requireO18y
-					 * @description Reject enrichment if userData.o18y is not true. Default false. On failure (after signature verification), the user and sessions are deleted.
-					 */
-					requireO18y?: boolean;
-					/**
-					 * requireO21y
-					 * @description Reject enrichment if userData.o21y is not true. Default false. On failure (after signature verification), the user and sessions are deleted.
-					 */
-					requireO21y?: boolean;
-					/**
-					 * requireKyc
-					 * @description Reject enrichment if userData.kyc is not true. Default false. On failure (after signature verification), the user and sessions are deleted.
-					 */
-					requireKyc?: boolean;
-					/**
-					 * allowedAaguids
-					 * @description AAGUID allowlist for passkey registration. When set (string or non-empty array), only these authenticator AAGUIDs are accepted (passkey create.before hook). Use false or omit to allow any.
-					 */
-					allowedAaguids?: string | string[] | false;
-					/**
-					 * allowRoutesBeforePasskey
-					 * @description Paths that remain accessible when user has no passkey yet. Default []. Only public behaviour applies: safe methods (GET, HEAD, OPTIONS) and passkey registration routes. Add paths only if you need more. Use endpoint path without basePath (e.g. /passkey/data).
-					 */
-					allowRoutesBeforePasskey?: string[];
-					/**
-					 * allowMethodsBeforePasskey
-					 * @description HTTP methods always allowed before first passkey (e.g. session fetch). Default ['GET', 'HEAD', 'OPTIONS'].
-					 */
-					allowMethodsBeforePasskey?: string[];
-					/**
-					 * allowPasskeyRegistrationRoutes
-					 * @description Paths used by Better Auth passkey plugin for registration; only needed if you use custom paths. Default already includes /passkey/generate-register-options and /passkey/verify-registration.
-					 */
-					allowPasskeyRegistrationRoutes?: string[];
-					/**
-					 * deleteAccountWithoutPasskeyAfterMs
-					 * @description Accounts with no passkey after this many ms since creation are deleted on next request (sessions + user). Default 300_000 (5 min). Response 403 REGISTRATION_TIMEOUT. Set to 0 to disable.
-					 */
-					deleteAccountWithoutPasskeyAfterMs?: number;
-					/**
-					 * allowNetwork
-					 * @description Which Core (ICAN) networks to allow in enrichment. Passed to better-auth-corepass-passkey.
-					 * @values Array of 'mainnet' | 'testnet' | 'enterprise'; or true (= mainnet only); or false (= testnet only). Default ['mainnet', 'enterprise'].
-					 */
-					allowNetwork?: readonly ('mainnet' | 'testnet' | 'enterprise')[] | true | false;
-					/**
-					 * allowOnlyBackedUp
-					 * @description When true, require userData.backedUp to be present and true in enrichment (CorePass backed up). Default false.
-					 */
-					allowOnlyBackedUp?: boolean;
-					/**
-					 * redirect
-					 * @description Fallback paths per action when no query param is set. Query param `redirect` takes precedence (e.g. /register?redirect=/dashboard). Omitted key = no config fallback for that action.
-					 */
-					redirect?: {
-						/** Path to redirect to after successful registration. */
-						register?: string;
-						/** Path to redirect to after successful login. */
-						login?: string;
-						/** Path to redirect to after logout. */
-						logout?: string;
-					};
-					/**
-					 * supportedAlgorithmIDs
-					 * @description COSE algorithm IDs for passkey registration (pubKeyCredParams). Optional. Order is strongest-first; authenticators often pick the first they support. Default (when omitted): [-53, -19, -8, -36, -7, -39, -38, -37, -259, -258, -257] i.e. Ed448, Ed25519, EdDSA, ES512, ES256, RSA-PSS (SHA-512/384/256), RSA-PKCS1 (SHA-512/384/256). Set to false to use @better-auth/passkey defaults only (-8, -7, -257).
-					 */
-					supportedAlgorithmIDs?: number[] | false;
-				};
-
-				/**
 				 * web3
 				 * @description Web3 / injected wallet. Required: `provider`, `methods.requestAccounts`, `methods.chainId`.
 				 */
 				web3?: {
+					/** Web3 addons may introduce additional client-visible options. */
+					[key: string]: unknown;
 					/**
 					 * provider
 					 * @description Preferred wallet provider id. Must match detectProvider type.

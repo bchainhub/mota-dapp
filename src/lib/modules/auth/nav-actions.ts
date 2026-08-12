@@ -72,6 +72,7 @@ export type AuthItemFromConfig = {
 	icon?: string;
 	show?: string;
 	className?: string;
+	action?: string;
 };
 
 /** Auth items for user dropdown from themeConfig.navbar.authItems. Each item may have show to control visibility per connection state. */
