@@ -86,7 +86,7 @@
 	</h2>
 	<div class="grid gap-6 md:grid-cols-2">
 		<div
-			class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6 shadow-sm transition-shadow hover:shadow-md"
+			class="min-w-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6 shadow-sm transition-shadow hover:shadow-md"
 		>
 			<div
 				class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
@@ -100,7 +100,7 @@
 			<pre class="overflow-x-auto rounded-lg bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 p-3 text-xs"><code>npx skills find   # discover skills · npx skills add owner/repo</code></pre>
 		</div>
 		<div
-			class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6 shadow-sm transition-shadow hover:shadow-md"
+			class="min-w-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6 shadow-sm transition-shadow hover:shadow-md"
 		>
 			<div
 				class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
