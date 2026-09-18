@@ -136,7 +136,7 @@ export default defineConfig({
 		sveltekit(),
 		VitePWA({
 			registerType: 'autoUpdate',
-			includeAssets: ['/icons/favicon.svg', 'robots.txt', '/icons/apple-touch-icon.png'],
+			includeAssets: ['img/icons/favicon.svg', 'robots.txt', 'img/icons/apple-touch-icon.png'],
 			workbox: {
 				// SvelteKit does not output index.html in precache; disable default fallback to avoid "non-precached-url" error.
 				navigateFallback: null
@@ -148,17 +148,17 @@ export default defineConfig({
 				theme_color: '#25c19f',
 				icons: [
 					{
-						src: '/icons/192.png',
+						src: '/img/icons/192.png',
 						sizes: '192x192',
 						type: 'image/png'
 					},
 					{
-						src: '/icons/512.png',
+						src: '/img/icons/512.png',
 						sizes: '512x512',
 						type: 'image/png'
 					},
 					{
-						src: '/icons/512.png',
+						src: '/img/icons/512.png',
 						sizes: '512x512',
 						type: 'image/png',
 						purpose: 'any maskable'
