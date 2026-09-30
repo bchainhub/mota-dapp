@@ -62,6 +62,7 @@
 	const web3Enabled = Array.isArray(authStrategy) ? authStrategy.includes('web3') : authStrategy === 'web3';
 
 	let isOpen = $state(false);
+	let headerHeight = $state(0);
 	let dropdownOpen = $state(false);
 	let theme = $state(respectPrefersColorScheme
 		? 'system'
@@ -398,9 +399,10 @@
 </script>
 
 <header
+	bind:clientHeight={headerHeight}
 	class={`site-header fixed top-8 left-0 right-0 z-50 w-full flex justify-center max-lg:justify-stretch lg:px-8 navigation ${style === 'transparent' ? 'transparent' : ''} ${orientation === 'vertical' ? 'vertical lg:mr-4 lg:static lg:top-auto lg:left-auto lg:right-auto lg:w-full' : 'horizontal'} ${orientation === 'vertical' && hideOnScroll ? 'transition-[transform,opacity] duration-300 ease-in-out' : 'transition-opacity duration-300 ease-in-out'} ${orientation === 'vertical' && hideOnScroll ? (!headerVisible ? '-translate-x-full opacity-0 pointer-events-none' : 'opacity-100') : (!headerVisible && hideOnScroll ? 'opacity-0' : 'opacity-100')}`}
 >
-	<div class={`nav-container w-full max-w-full min-w-0 flex items-center lg:container lg:mx-3 p-3 lg:rounded-xl relative z-50 ${style === 'transparent' ? 'transparent' : style === 'blur' ? 'bg-slate-900/80 backdrop-blur-md border border-slate-700/50' : style === 'auto' ? 'bg-slate-900/90 border border-slate-700/50 dark:bg-slate-200/90 dark:border dark:border-slate-400/50' : 'bg-slate-900/90 border border-slate-700/50'} ${orientation === 'vertical' ? 'lg:mt-8' : 'lg:mt-6'} ${orientation === 'vertical' ? 'lg:flex-col lg:max-w-[300px] lg:pt-6' : ''}`} style={style === 'blur' ? 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);' : ''}>
+	<div class={`nav-container w-full max-w-full min-w-0 flex items-center lg:container lg:mx-3 p-3 max-lg:pt-[calc(0.75rem+env(safe-area-inset-top,0px))] max-lg:pl-[max(0.75rem,env(safe-area-inset-left,0px))] max-lg:pr-[max(0.75rem,env(safe-area-inset-right,0px))] lg:rounded-xl relative z-50 ${style === 'transparent' ? 'transparent' : style === 'blur' ? 'bg-slate-900/80 backdrop-blur-md border border-slate-700/50' : style === 'auto' ? 'bg-slate-900/90 border border-slate-700/50 dark:bg-slate-200/90 dark:border dark:border-slate-400/50' : 'bg-slate-900/90 border border-slate-700/50'} ${orientation === 'vertical' ? 'lg:mt-8' : 'lg:mt-6'} ${orientation === 'vertical' ? 'lg:flex-col lg:max-w-[300px] lg:pt-6' : ''}`} style={style === 'blur' ? 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);' : ''}>
 		<div class={`flex flex-1 min-w-0 items-center desktop-menu min-h-12 ${orientation === 'vertical' ? 'lg:flex-col lg:gap-4 lg:pb-6' : ''}`}>
 			{#if logo}
 				<a
@@ -685,7 +687,8 @@
 	{#if isOpen}
 		<nav
 			id="dropdown-menu"
-			class="fixed top-18 left-0 right-0 bottom-0 overflow-hidden lg:hidden bg-gray-800 z-50"
+			class="fixed left-0 right-0 bottom-0 overflow-hidden lg:hidden bg-gray-800 z-50 max-lg:pb-[env(safe-area-inset-bottom,0px)] max-lg:pl-[env(safe-area-inset-left,0px)] max-lg:pr-[env(safe-area-inset-right,0px)]"
+			style:top={`${headerHeight}px`}
 		>
 			<div class="relative overflow-hidden h-full">
 				<!-- Main Menu -->
