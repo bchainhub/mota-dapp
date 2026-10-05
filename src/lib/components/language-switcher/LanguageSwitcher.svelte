@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { ChevronDown, ChevronRight } from '@lucide/svelte';
-	import { Icon } from '$lib/components';
+	import { Icon } from '#lib/components/index.js';
 	import { onMount } from 'svelte';
-	import { applyLocale } from '$lib/helpers/i18n';
-	import { getStoredLocale } from '$lib/helpers/storageKeys';
-	import { getSiteConfig } from '$lib/helpers/siteConfig';
+	import { applyLocale } from '#lib/helpers/i18n.js';
+	import { getStoredLocale } from '#lib/helpers/storageKeys.js';
+	import { getSiteConfig } from '#lib/helpers/siteConfig.js';
 
 	let {
 		currentLocale = 'en',

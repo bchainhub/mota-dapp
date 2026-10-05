@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { onDestroy, onMount } from 'svelte';
-	import { LL, t } from '$lib/helpers/i18n';
+	import { LL, t } from '#lib/helpers/i18n.js';
 	import { Icon } from '$components';
-	import { asDynamicIcon } from '$lib/helpers/icon';
+	import { asDynamicIcon } from '#lib/helpers/icon.js';
 	import { ArrowUpLeft, ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Key, Wallet } from '@lucide/svelte';
 	import { blo } from '@blockchainhub/blo';
-	import { shortFormat, type ShortFormatKind } from '$lib/helpers/shortFormat';
+	import { shortFormat, type ShortFormatKind } from '#lib/helpers/shortFormat.js';
 
 	const {
 		title = null,

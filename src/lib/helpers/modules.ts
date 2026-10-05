@@ -8,7 +8,7 @@
  * Module must reside in config.modules and be enabled.
  */
 
-import { getSiteConfig } from '$lib/helpers/siteConfig';
+import { getSiteConfig } from '#lib/helpers/siteConfig.js';
 
 /** Any module name. Use "parent.sub" for submodules (e.g. "auth.passkey"), or a single key for top-level (e.g. "banking"). */
 export type ModuleName = string;

@@ -4,8 +4,8 @@
 	import { ArrowUpLeft, ArrowUpRight, ChevronRight } from '@lucide/svelte';
 	import { Icon, Tooltip } from '$components';
 	import { Key } from '@lucide/svelte';
-	import { asDynamicIcon } from '$lib/helpers/icon';
-	import { LL, t, torNot } from '$lib/helpers/i18n';
+	import { asDynamicIcon } from '#lib/helpers/icon.js';
+	import { LL, t, torNot } from '#lib/helpers/i18n.js';
 	import { walletAddress } from '$modules/auth/web3';
 	import {
 		getAuthNavActions,
@@ -14,9 +14,9 @@
 		isLoggedIn as isLoggedInHelper,
 		getAuthProviders
 	} from '$modules/auth/nav-actions';
-	import { shouldShowItem, type ItemWithShow } from '$lib/helpers/nav';
-	import { loadModule } from '$lib/helpers/modules';
-	import { getSiteConfig, getSiteTitleParts } from '$lib/helpers/siteConfig';
+	import { shouldShowItem, type ItemWithShow } from '#lib/helpers/nav.js';
+	import { loadModule } from '#lib/helpers/modules.js';
+	import { getSiteConfig, getSiteTitleParts } from '#lib/helpers/siteConfig.js';
 
 	const _cfg = getSiteConfig();
 	const footerCfg = _cfg?.themeConfig?.footer;

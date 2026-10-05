@@ -1,3 +1,5 @@
+import adapter from '@sveltejs/adapter-auto';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sveltekit } from '@sveltejs/kit/vite';
@@ -133,11 +135,27 @@ export default defineConfig({
 	},
 	plugins: [
 		tailwindcss(),
-		sveltekit(),
+		sveltekit({
+			preprocess: vitePreprocess(),
+			alias: {
+				// Compatibility for addons that still use the old library alias.
+				$lib: 'src/lib',
+				$data: 'src/data',
+				$components: 'src/lib/components',
+				$modules: 'src/lib/modules'
+			},
+			adapter: adapter()
+		}),
 		VitePWA({
 			registerType: 'autoUpdate',
+			outDir: '.svelte-kit/output/client',
+			injectRegister: false,
 			includeAssets: ['img/icons/favicon.svg', 'robots.txt', 'img/icons/apple-touch-icon.png'],
 			workbox: {
+				globPatterns: ['_app/immutable/**/*.{js,css,wasm}'],
+				cleanupOutdatedCaches: true,
+				skipWaiting: true,
+				clientsClaim: true,
 				// SvelteKit does not output index.html in precache; disable default fallback to avoid "non-precached-url" error.
 				navigateFallback: null
 			},

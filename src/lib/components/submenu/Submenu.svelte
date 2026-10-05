@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Icon } from '$components';
-	import { asDynamicIcon } from '$lib/helpers/icon';
+	import { asDynamicIcon } from '#lib/helpers/icon.js';
 	import { ArrowUpLeft, ArrowUpRight, ChevronDown, ChevronRight } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

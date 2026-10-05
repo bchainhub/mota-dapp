@@ -1,3 +1,5 @@
+/// <reference types="vite-plugin-pwa/client" />
+
 declare module 'vite-plugin-config' {
 	/**
 	 * Site configuration injected at build time as `__SITE_CONFIG__`.
@@ -412,7 +414,7 @@ declare module 'vite-plugin-config' {
 
 /**
  * __SITE_CONFIG__
- * @description Site config injected at build time by Vite define. Client and server use getSiteConfig() from $lib/helpers/siteConfig.
+ * @description Site config injected at build time by Vite define. Client and server use getSiteConfig() from #lib/helpers/siteConfig.js.
  */
 declare const __SITE_CONFIG__: import('vite-plugin-config').Config;
 
@@ -657,26 +659,4 @@ declare namespace App {
 			[key: string]: string | undefined;
 		};
 	}
-}
-
-/**
- * $env/dynamic/private
- * @description Private env vars (server-only). Import from '$env/dynamic/private'.
- */
-declare module '$env/dynamic/private' {
-	/**
-	 * CAPTURE_COUNTRY
-	 * @description Country to use when geo is unavailable (e.g. for dev).
-	 */
-	export const CAPTURE_COUNTRY: string | undefined;
-	/**
-	 * CAPTURE_CITY
-	 * @description City to use when geo is unavailable (e.g. for dev).
-	 */
-	export const CAPTURE_CITY: string | undefined;
-	/**
-	 * BANKING_API_KEY
-	 * @description Banking API key (secret). Use when calling banking API from server.
-	 */
-	export const BANKING_API_KEY: string | undefined;
 }

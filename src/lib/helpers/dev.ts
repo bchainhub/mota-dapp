@@ -3,7 +3,7 @@
  * Treats import.meta.env.DEV as true when it is boolean true, number 1, or string '1'/'true'.
  */
 
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 
 function envDevTruthy(): boolean {
 	if (typeof import.meta === 'undefined') return false;

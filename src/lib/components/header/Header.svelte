@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { page } from '$app/state';
 	import { ArrowUpLeft, ArrowUpRight, Eclipse, Menu, Moon, Sun, X } from '@lucide/svelte';
 	import { ActionsDropdown, Icon, LanguageSwitcher, LanguageSwitcherCompact, Submenu, SubmenuCompact } from '$components';
-	import { asDynamicIcon } from '$lib/helpers/icon';
-	import { LL, locale as localeStore } from '$lib/helpers/i18n';
-	import { t, getAvailableLocalesWithNamesAsync, applyLocale } from '$lib/helpers/i18n';
+	import { asDynamicIcon } from '#lib/helpers/icon.js';
+	import { LL, locale as localeStore } from '#lib/helpers/i18n.js';
+	import { t, getAvailableLocalesWithNamesAsync, applyLocale } from '#lib/helpers/i18n.js';
 	import { walletAddress, walletType, autoLogin, shouldAutoConnect, initPostInstallWalletAction, isCoreEcosystem } from '$modules/auth/web3';
-	import type { ShortFormatKind } from '$lib/helpers/shortFormat';
+	import type { ShortFormatKind } from '#lib/helpers/shortFormat.js';
 	import { goto } from '$app/navigation';
 	import {
 		getAuthNavActions,
@@ -19,10 +19,10 @@
 		getAuthItemsFromConfig,
 		getNavbarItemsFromConfig
 	} from '$modules/auth/nav-actions';
-	import { filterNavItemsByAuth } from '$lib/helpers/nav';
-	import { evaluateShowRule } from '$lib/helpers/showRule';
-	import { getStoredTheme, setStoredTheme, removeStoredTheme } from '$lib/helpers/storageKeys';
-	import { getSiteConfig, getSiteTitleParts } from '$lib/helpers/siteConfig';
+	import { filterNavItemsByAuth } from '#lib/helpers/nav.js';
+	import { evaluateShowRule } from '#lib/helpers/showRule.js';
+	import { getStoredTheme, setStoredTheme, removeStoredTheme } from '#lib/helpers/storageKeys.js';
+	import { getSiteConfig, getSiteTitleParts } from '#lib/helpers/siteConfig.js';
 
 	const { layoutData, session: sessionProp = undefined }: { layoutData?: Record<string, unknown>; session?: App.Locals['session'] } = $props();
 
@@ -101,7 +101,7 @@
 	});
 
 	const visibleItems = $derived(
-		filterNavItemsByAuth(items as import('$lib/helpers/nav').ItemWithShow[], showContext, authEnabled) as NavbarItem[]
+		filterNavItemsByAuth(items as import('#lib/helpers/nav.js').ItemWithShow[], showContext, authEnabled) as NavbarItem[]
 	);
 
 	/** Display label for the user dropdown: wallet, Core ID, or passkey user fields. */

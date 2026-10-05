@@ -1,4 +1,4 @@
-import { evaluateShowRule, type ShowRuleContext } from '$lib/helpers/showRule';
+import { evaluateShowRule, type ShowRuleContext } from '#lib/helpers/showRule.js';
 
 export type { ShowRuleContext };
 

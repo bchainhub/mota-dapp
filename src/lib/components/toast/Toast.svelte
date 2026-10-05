@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-	import { getSiteConfig } from '$lib/helpers/siteConfig';
+	import { getSiteConfig } from '#lib/helpers/siteConfig.js';
 	const { style } = (getSiteConfig()?.themeConfig as { navbar?: { style?: string } } | undefined)?.navbar || {};
 
 	export function toastType(type: string): string {

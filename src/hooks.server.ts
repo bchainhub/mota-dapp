@@ -1,11 +1,11 @@
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit/hooks';
 import { sequence } from '@sveltejs/kit/hooks';
 import { json } from '@sveltejs/kit';
-import { ApiError } from '$lib/server/apiError';
-import { getGeoData } from '$lib/helpers/geo';
-import { getPrimaryAuthModuleName, isModuleEnabled } from '$lib/helpers/modules';
-import { loadAuthModuleServer } from '$lib/helpers/modules.server';
-import { getSiteConfig, isApiVersionEnabled } from '$lib/helpers/siteConfig';
+import { ApiError } from '#lib/server/apiError.js';
+import { getGeoData } from '#lib/helpers/geo.js';
+import { getPrimaryAuthModuleName, isModuleEnabled } from '#lib/helpers/modules.js';
+import { loadAuthModuleServer } from '#lib/helpers/modules.server.js';
+import { getSiteConfig, isApiVersionEnabled } from '#lib/helpers/siteConfig.js';
 import type { Config } from 'vite-plugin-config';
 
 type ApiConfig = NonNullable<Config['api']>;

@@ -1,7 +1,7 @@
-import { browser } from '$app/environment';
-import { isDev } from '$lib/helpers/dev';
-import type { LLType } from '$lib/helpers/i18n';
-import { getSiteConfig } from '$lib/helpers/siteConfig';
+import { browser } from '$app/env';
+import { isDev } from '#lib/helpers/dev.js';
+import type { LLType } from '#lib/helpers/i18n.js';
+import { getSiteConfig } from '#lib/helpers/siteConfig.js';
 import { connectWallet, disconnectWallet } from './web3';
 
 type AuthConfig = { enabled?: boolean; strategy?: string | string[]; primaryStrategy?: string };

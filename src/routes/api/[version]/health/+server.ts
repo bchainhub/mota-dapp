@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { handleOptions, withCorsHeaders } from '$lib/server/apiHandler';
+import { handleOptions, withCorsHeaders } from '#lib/server/apiHandler.js';
 
 // Handle OPTIONS requests for CORS
 export const OPTIONS = handleOptions;
