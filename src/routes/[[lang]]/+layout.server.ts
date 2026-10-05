@@ -5,9 +5,9 @@ import {
 	getFirstSegmentLocale,
 	initLLForSsr,
 	pathWithoutFirstLocale
-} from '$lib/helpers/i18n';
+} from '#lib/helpers/i18n.js';
 
-import { getSiteConfig } from '$lib/helpers/siteConfig';
+import { getSiteConfig } from '#lib/helpers/siteConfig.js';
 const languageConfig = getSiteConfig()?.language;
 const available = getAvailableLocales();
 const defaultLocale = languageConfig?.defaultLocale || 'en';

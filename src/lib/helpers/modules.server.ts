@@ -1,6 +1,6 @@
 /**
  * Server-only module loader. Loads auth submodules via server.ts (exports authHandle)
- * so that $env/dynamic/private and other server-only code never get into the client bundle.
+ * so that $app/env/private and other server-only code never get into the client bundle.
  * Use this in hooks.server.ts for the primary auth handle.
  */
 

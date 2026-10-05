@@ -1,4 +1,4 @@
-import * as privateDynamicEnv from '$env/dynamic/private';
+import * as env from '$app/env/private';
 import type { RequestEvent } from '@sveltejs/kit';
 
 /**
@@ -11,7 +11,6 @@ export function getGeoData(event: RequestEvent): void {
 	if (!event.platform && !event.request) {
 		return;
 	}
-	const env = privateDynamicEnv?.env;
 	// Cloudflare Workers: Access geographical data via platform.cf
 	if (event.platform?.cf) {
 		if (env?.CAPTURE_COUNTRY && event.platform.cf.country) {

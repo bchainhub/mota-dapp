@@ -1,10 +1,10 @@
 import { get, writable } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { toast } from '$components';
-import { browser } from '$app/environment';
+import { browser } from '$app/env';
 import { deviceSherlock } from 'device-sherlock';
-import { getRedirectTo } from '$lib/helpers/redirect';
-import { getSiteConfig } from '$lib/helpers/siteConfig';
+import { getRedirectTo } from '#lib/helpers/redirect.js';
+import { getSiteConfig } from '#lib/helpers/siteConfig.js';
 
 type Web3Config = NonNullable<NonNullable<NonNullable<ReturnType<typeof getSiteConfig>>['modules']>['auth']>['web3'];
 type Web3AppConfig = NonNullable<Web3Config>['app'];

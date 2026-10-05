@@ -1,7 +1,7 @@
-import { browser } from '$app/environment';
+import { browser } from '$app/env';
 import { get, writable, type Writable } from 'svelte/store';
-import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
-import { getSiteConfig } from '$lib/helpers/siteConfig';
+import { getStoredLocale, setStoredLocale } from '#lib/helpers/storageKeys.js';
+import { getSiteConfig } from '#lib/helpers/siteConfig.js';
 import { isLocale, loadedLocales } from '../../i18n/i18n-util';
 import type { Locales } from '../../i18n/i18n-types';
 

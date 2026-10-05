@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Header, Footer } from '$components';
-	import { onMount, onDestroy } from 'svelte';
-	import { browser } from '$app/environment';
+	import { onMount, onDestroy, type Snippet } from 'svelte';
+	import { browser } from '$app/env';
 	import { page } from '$app/state';
 	import type { LayoutData } from './$types';
 	import {
@@ -9,13 +9,13 @@
 		detectLocale,
 		getAvailableLocales,
 		getFirstSegmentLocale
-	} from '$lib/helpers/i18n';
-	import { getStoredLocale, setStoredLocale } from '$lib/helpers/storageKeys';
-	import { getSiteConfig } from '$lib/helpers/siteConfig';
-	import { LL, t } from '$lib/helpers/i18n';
+	} from '#lib/helpers/i18n.js';
+	import { getStoredLocale, setStoredLocale } from '#lib/helpers/storageKeys.js';
+	import { getSiteConfig } from '#lib/helpers/siteConfig.js';
+	import { LL, t } from '#lib/helpers/i18n.js';
 	import type { Config } from 'vite-plugin-config';
 
-	export let data: LayoutData;
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	const __cfg = getSiteConfig();
 	const cfg: Partial<Config> = __cfg ?? {};
@@ -30,7 +30,8 @@
 	const enabled = language?.enabled || false;
 
 	// Apply locale: explicit path segment wins (stable during link prefetch), then URL flag + data, then stored, …
-	$: if (enabled && browser) {
+	$effect(() => {
+		if (!enabled || !browser) return;
 		const storedLocale = getStoredLocale();
 		const localeCodes = getAvailableLocales();
 		const segmentLocale = getFirstSegmentLocale(page.url.pathname);
@@ -83,9 +84,9 @@
 			document.documentElement.setAttribute('lang', finalLocale);
 			applyLocale(finalLocale);
 		}
-	}
+	});
 
-	let isNavHidden = false;
+	let isNavHidden = $state(false);
 
 	const handleNavHiddenChange = (event: CustomEvent) => {
 		isNavHidden = event.detail.isHidden;
@@ -138,7 +139,7 @@
 	<main
 		class={`container flex-1 mx-auto px-4 xl:px-0 min-w-0 ${navbar && navbar.orientation === 'vertical' && navbar.hideOnScroll ? 'transition-[width] duration-300 ease-in-out' : ''} ${navbar && navbar.orientation === 'vertical' ? 'max-lg:pt-8' : 'pt-8'}`}
 	>
-		<slot />
+		{@render children()}
 	</main>
 </div>
 <Footer session={(data as { session?: App.Locals['session'] }).session} />

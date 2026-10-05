@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
 	import { Icon } from '$components';
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { getLocale, applyLocale, pathWithLocale } from '$lib/helpers/i18n';
-	import { getSiteConfig } from '$lib/helpers/siteConfig';
-	import { locale as localeStore } from '$lib/helpers/i18n';
+	import { getLocale, applyLocale, pathWithLocale } from '#lib/helpers/i18n.js';
+	import { getSiteConfig } from '#lib/helpers/siteConfig.js';
+	import { locale as localeStore } from '#lib/helpers/i18n.js';
 
 	let {
 		title = '',
