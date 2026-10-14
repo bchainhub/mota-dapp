@@ -1,7 +1,5 @@
 import adapter from '@sveltejs/adapter-auto';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -9,9 +7,6 @@ import type { Config } from 'vite-plugin-config';
 import tailwindcss from '@tailwindcss/vite';
 
 declare const process: { env: Record<string, string | undefined> };
-
-/** Project root (vite.config.ts directory). Duplicates kit.alias so Vite/SSR resolves `$components/*` etc. reliably. */
-const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 // Language configuration: availableLocales as locale codes; names are read from each locale's language.descriptiveName in src/i18n
 const languageConfig = {
@@ -126,24 +121,10 @@ const siteConfigClient: Config = {
 };
 
 export default defineConfig({
-	resolve: {
-		alias: {
-			$components: path.resolve(projectRoot, 'src/lib/components'),
-			$data: path.resolve(projectRoot, 'src/data'),
-			$modules: path.resolve(projectRoot, 'src/lib/modules')
-		}
-	},
 	plugins: [
 		tailwindcss(),
 		sveltekit({
 			preprocess: vitePreprocess(),
-			alias: {
-				// Compatibility for addons that still use the old library alias.
-				$lib: 'src/lib',
-				$data: 'src/data',
-				$components: 'src/lib/components',
-				$modules: 'src/lib/modules'
-			},
 			adapter: adapter()
 		}),
 		VitePWA({
@@ -183,11 +164,21 @@ export default defineConfig({
 					}
 				]
 			}
+		}).map((plugin) => {
+			// SvelteKit renders app.html itself; manifest and registration are handled
+			// by app.html and +layout.svelte rather than Vite's HTML pipeline.
+			delete plugin.transformIndexHtml;
+			if (plugin.name === 'vite-plugin-pwa:build') {
+				// Kit 3 builds server and client environments separately. Generate the
+				// service worker only after the client assets have been written.
+				plugin.applyToEnvironment = (environment) => environment.name === 'client';
+			}
+			return plugin;
 		})
 	],
 	define: {
 		__SITE_CONFIG__: JSON.stringify(siteConfigClient),
-		'import.meta.env.DEV': process.env.DEV_MODE === '1'
+		__DEV_MODE__: process.env.DEV_MODE === '1'
 	},
 	ssr: {
 		noExternal: ['@lucide/svelte']
