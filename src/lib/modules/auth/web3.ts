@@ -1,6 +1,6 @@
 import { get, writable } from 'svelte/store';
 import { goto } from '$app/navigation';
-import { toast } from '$components';
+import { toast } from '#components';
 import { browser } from '$app/env';
 import { deviceSherlock } from 'device-sherlock';
 import { getRedirectTo } from '#lib/helpers/redirect.js';

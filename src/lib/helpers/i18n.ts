@@ -2,7 +2,7 @@ import { browser } from '$app/env';
 import { get, writable, type Writable } from 'svelte/store';
 import { getStoredLocale, setStoredLocale } from '#lib/helpers/storageKeys.js';
 import { getSiteConfig } from '#lib/helpers/siteConfig.js';
-import { isLocale, loadedLocales } from '../../i18n/i18n-util';
+import { isLocale, loadedLocales, i18nObject, baseLocale } from '../../i18n/i18n-util';
 import type { Locales } from '../../i18n/i18n-types';
 
 const config = getSiteConfig()?.language;
@@ -267,11 +267,10 @@ export const applyLocale = async (localeToApply: string) => {
 export async function initLLForSsr(localeToApply: string): Promise<void> {
 	if (!config?.enabled) return;
 	try {
-		const util = await import('../../i18n/i18n-util');
 		const utilAsync = await import('../../i18n/i18n-util.async');
-		if (util.isLocale(localeToApply)) {
+		if (isLocale(localeToApply)) {
 			await utilAsync.loadLocaleAsync(localeToApply);
-			LL.set(util.i18nObject(localeToApply) as unknown as LLType);
+			LL.set(i18nObject(localeToApply) as unknown as LLType);
 		}
 	} catch {
 		// typesafe-i18n or i18n folder not present; LL stays as proxy, t() returns keys
@@ -282,9 +281,8 @@ export async function initLLForSsr(localeToApply: string): Promise<void> {
 export const loadLocaleAsync = async (localeToLoad: string) => {
 	if (!config?.enabled) return;
 	try {
-		const util = await import('../../i18n/i18n-util');
 		const utilAsync = await import('../../i18n/i18n-util.async');
-		if (util.isLocale(localeToLoad)) await utilAsync.loadLocaleAsync(localeToLoad);
+		if (isLocale(localeToLoad)) await utilAsync.loadLocaleAsync(localeToLoad);
 	} catch {
 		// typesafe-i18n or i18n folder not present
 	}
@@ -300,11 +298,10 @@ export async function getLLForLocale(localeToApply: string): Promise<LLType> {
 		return get(LL);
 	}
 	try {
-		const util = await import('../../i18n/i18n-util');
 		const utilAsync = await import('../../i18n/i18n-util.async');
-		const loc = util.isLocale(localeToApply) ? localeToApply : util.baseLocale;
+		const loc = isLocale(localeToApply) ? localeToApply : baseLocale;
 		await utilAsync.loadLocaleAsync(loc);
-		const dict = util.loadedLocales[loc];
+		const dict = loadedLocales[loc];
 		if (dict && typeof dict === 'object' && Object.keys(dict as object).length > 0) {
 			return dict as unknown as LLType;
 		}

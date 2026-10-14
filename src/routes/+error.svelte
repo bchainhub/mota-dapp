@@ -94,7 +94,7 @@
 							<div
 								class="flex-none w-14 h-14 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300 flex items-center justify-center"
 							>
-								<svelte:component this={item.icon} class="w-6 h-6" />
+								<item.icon class="w-6 h-6" />
 							</div>
 							<div class="space-y-1">
 								<h4 class="text-gray-800 dark:text-gray-100 font-medium">{item.title}</h4>

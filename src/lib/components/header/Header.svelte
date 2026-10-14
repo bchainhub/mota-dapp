@@ -3,11 +3,11 @@
 	import { browser } from '$app/env';
 	import { page } from '$app/state';
 	import { ArrowUpLeft, ArrowUpRight, Eclipse, Menu, Moon, Sun, X } from '@lucide/svelte';
-	import { ActionsDropdown, Icon, LanguageSwitcher, LanguageSwitcherCompact, Submenu, SubmenuCompact } from '$components';
+	import { ActionsDropdown, Icon, LanguageSwitcher, LanguageSwitcherCompact, Submenu, SubmenuCompact } from '#components';
 	import { asDynamicIcon } from '#lib/helpers/icon.js';
 	import { LL, locale as localeStore } from '#lib/helpers/i18n.js';
 	import { t, getAvailableLocalesWithNamesAsync, applyLocale } from '#lib/helpers/i18n.js';
-	import { walletAddress, walletType, autoLogin, shouldAutoConnect, initPostInstallWalletAction, isCoreEcosystem } from '$modules/auth/web3';
+	import { walletAddress, walletType, autoLogin, shouldAutoConnect, initPostInstallWalletAction, isCoreEcosystem } from '#modules/auth/web3.js';
 	import type { ShortFormatKind } from '#lib/helpers/shortFormat.js';
 	import { goto } from '$app/navigation';
 	import {
@@ -18,7 +18,7 @@
 		getAuthProvider,
 		getAuthItemsFromConfig,
 		getNavbarItemsFromConfig
-	} from '$modules/auth/nav-actions';
+	} from '#modules/auth/nav-actions.js';
 	import { filterNavItemsByAuth } from '#lib/helpers/nav.js';
 	import { evaluateShowRule } from '#lib/helpers/showRule.js';
 	import { getStoredTheme, setStoredTheme, removeStoredTheme } from '#lib/helpers/storageKeys.js';
@@ -155,16 +155,19 @@
 		const authItems = getAuthItemsFromConfig().filter(
 			(item) => evaluateShowRule(item.show, ctx)
 		);
-		const authMenuItems: MenuItem[] = authItems.map((item) => ({
-			label: item.label ? t(item.label, $LL) : '',
-			to: item.to,
-			href: item.href,
-			target: item.target as MenuItem['target'],
-			rel: item.rel,
-			className: item.className,
-			icon: item.icon,
-			action: item.action ? () => Promise.resolve(resolveAuthNavAction(item.action, authNavActions)?.()) : undefined
-		}));
+		const authMenuItems: MenuItem[] = authItems.map((item) => {
+			const action = resolveAuthNavAction(item.action ?? '', authNavActions);
+			return {
+				label: item.label ? t(item.label, $LL) : '',
+				to: item.to,
+				href: item.href,
+				target: item.target as MenuItem['target'],
+				rel: item.rel,
+				className: item.className,
+				icon: item.icon,
+				action: action ? () => Promise.resolve(action()) : undefined
+			};
+		});
 		const logoutItem: MenuItem = {
 			label: t('common.logout', $LL),
 			className: undefined,

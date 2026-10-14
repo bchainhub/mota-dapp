@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { dev } from '$app/env';
 	import '../css/app.css';
-	import Toast from '$components/toast/Toast.svelte';
+	import Toast from '#components/toast/Toast.svelte';
 
 	onMount(() => {
 		if (dev) return;

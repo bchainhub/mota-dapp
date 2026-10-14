@@ -2,7 +2,7 @@
 	import { browser } from '$app/env';
 	import { onDestroy, onMount } from 'svelte';
 	import { LL, t } from '#lib/helpers/i18n.js';
-	import { Icon } from '$components';
+	import { Icon } from '#components';
 	import { asDynamicIcon } from '#lib/helpers/icon.js';
 	import { ArrowUpLeft, ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Key, Wallet } from '@lucide/svelte';
 	import { blo } from '@blockchainhub/blo';

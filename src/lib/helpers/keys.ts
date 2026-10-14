@@ -1,4 +1,4 @@
-import { toast } from '$components';
+import { toast } from '#components';
 
 /**
  * Copies text to clipboard and shows a toast notification

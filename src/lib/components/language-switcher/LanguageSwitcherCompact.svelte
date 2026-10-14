@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
-	import { Icon } from '$components';
+	import { Icon } from '#components';
 	import { browser } from '$app/env';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';

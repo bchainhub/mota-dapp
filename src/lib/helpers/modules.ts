@@ -60,29 +60,29 @@ export function isModuleEnabled(module: ModuleName): boolean {
 }
 
 /**
- * Returns the $modules path to the loadable module (auth, banking, minting live under $modules).
- * "auth.passkey" -> $modules/auth/passkey; "banking" -> $modules/banking.
+ * Returns the #modules path to the loadable module (auth, banking, minting live under #modules).
+ * "auth.passkey" -> #modules/auth/passkey; "banking" -> #modules/banking.
  */
 export function getModuleRoute(module: ModuleName): string {
 	if (typeof module !== 'string' || !module.trim()) return '';
 	const parsed = parseModule(module);
 	if (parsed.parent !== null) {
-		return `$modules/${parsed.parent}/${parsed.sub}`;
+		return `#modules/${parsed.parent}/${parsed.sub}`;
 	}
-	return `$modules/${module.trim()}`;
+	return `#modules/${module.trim()}`;
 }
 
 /**
  * Loads a module only when it is enabled. Path from getModuleRoute(module).
  * Client-safe: only index.ts entries (auth server entries are loaded via loadModuleServer in hooks).
  */
-const moduleLoaders = import.meta.glob<Record<string, unknown>>('$modules/**/index.ts');
+const moduleLoaders = import.meta.glob<Record<string, unknown>>('#modules/**/index.ts');
 
 /** Path suffix for glob key match (e.g. 'auth/passkey/index.ts'). */
 function getLoaderPathSuffix(module: ModuleName): string {
 	const route = getModuleRoute(module);
 	if (!route) return '';
-	return route.replace(/^\$modules\/?/, '') + '/index.ts';
+	return route.replace(/^#modules\/?/, '') + '/index.ts';
 }
 
 export async function loadModule(module: ModuleName): Promise<unknown | null> {

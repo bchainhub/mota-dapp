@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Header, Footer } from '$components';
+	import { Header, Footer } from '#components';
 	import { onMount, onDestroy, type Snippet } from 'svelte';
 	import { browser } from '$app/env';
 	import { page } from '$app/state';

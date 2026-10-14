@@ -660,3 +660,6 @@ declare namespace App {
 		};
 	}
 }
+
+/** Explicit preview override; Vite retains its native development flag. */
+declare const __DEV_MODE__: boolean;
