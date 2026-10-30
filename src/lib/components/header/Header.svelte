@@ -7,7 +7,7 @@
 	import { asDynamicIcon } from '#lib/helpers/icon.js';
 	import { LL, locale as localeStore } from '#lib/helpers/i18n.js';
 	import { t, getAvailableLocalesWithNamesAsync, applyLocale } from '#lib/helpers/i18n.js';
-	import { walletAddress, walletType, autoLogin, shouldAutoConnect, initPostInstallWalletAction, isCoreEcosystem } from '#modules/auth/web3.js';
+	import { walletAddress, walletType, initProviderDiscovery, autoLogin, shouldAutoConnect, initPostInstallWalletAction, isCoreEcosystem } from '#modules/auth/web3.js';
 	import type { ShortFormatKind } from '#lib/helpers/shortFormat.js';
 	import { goto } from '$app/navigation';
 	import {
@@ -36,9 +36,9 @@
 	/** Auth is optional; only filter by show when auth is enabled (passkey or web3). */
 	const authEnabled = $derived(isAuthEnabled());
 	const _cfg = getSiteConfig();
-	const items = $derived.by(() => {
+	const items = $derived.by((): NavbarItem[] => {
 		const fromConfig = getNavbarItemsFromConfig();
-		return fromConfig.length ? fromConfig : (_cfg?.themeConfig as { navbar?: { items?: unknown[] } } | undefined)?.navbar?.items ?? [];
+		return (fromConfig.length ? fromConfig : (_cfg?.themeConfig as { navbar?: { items?: unknown[] } } | undefined)?.navbar?.items ?? []) as NavbarItem[];
 	});
 	const isLoggedIn = $derived(isLoggedInHelper(session, $walletAddress));
 	const connected = $derived(session?.walletConnected ?? !!$walletAddress);
@@ -100,8 +100,15 @@
 		return logo.src;
 	});
 
+	type HeaderNavItem = NavbarItem & { accountMenu?: boolean };
+	const accountMenuIndex = $derived(authEnabled && isLoggedIn
+		? items.findIndex((item) => item.action === 'manualConnect') : -1);
+	const hasAccountMenuSlot = $derived(accountMenuIndex !== -1);
+	const positionedItems = $derived(items.map((item, index): HeaderNavItem =>
+		index === accountMenuIndex ? { ...item, show: undefined, accountMenu: true } : item));
+
 	const visibleItems = $derived(
-		filterNavItemsByAuth(items as import('#lib/helpers/nav.js').ItemWithShow[], showContext, authEnabled) as NavbarItem[]
+		filterNavItemsByAuth(positionedItems as import('#lib/helpers/nav.js').ItemWithShow[], showContext, authEnabled) as HeaderNavItem[]
 	);
 
 	/** Display label for the user dropdown: wallet, Core ID, or passkey user fields. */
@@ -329,6 +336,7 @@
 		}
 
 		if (browser && web3Enabled) {
+			initProviderDiscovery();
 			initPostInstallWalletAction();
 		}
 
@@ -401,6 +409,24 @@
 	});
 </script>
 
+{#snippet accountDropdown(mobile = false)}
+	<ActionsDropdown
+		title={userDropdownTitle}
+		formatKind={userDropdownFormatKind}
+		providerIcon={userDropdownProviderIcon}
+		open={dropdownOpen}
+		items={menuItems}
+		position={mobile ? 'left' : 'right'}
+		isSmall={mobile}
+		{iconExternal}
+		orientation={mobile ? 'horizontal' : orientation}
+		theme={style}
+		onChange={handleSelect}
+		onItemSelect={mobile ? closeMenu : undefined}
+		className={mobile ? 'w-full py-8' : ''}
+	/>
+{/snippet}
+
 <header
 	bind:clientHeight={headerHeight}
 	class={`site-header fixed top-8 left-0 right-0 z-50 w-full flex justify-center max-lg:justify-stretch lg:px-8 navigation ${style === 'transparent' ? 'transparent' : ''} ${orientation === 'vertical' ? 'vertical lg:mr-4 lg:static lg:top-auto lg:left-auto lg:right-auto lg:w-full' : 'horizontal'} ${orientation === 'vertical' && hideOnScroll ? 'transition-[transform,opacity] duration-300 ease-in-out' : 'transition-opacity duration-300 ease-in-out'} ${orientation === 'vertical' && hideOnScroll ? (!headerVisible ? '-translate-x-full opacity-0 pointer-events-none' : 'opacity-100') : (!headerVisible && hideOnScroll ? 'opacity-0' : 'opacity-100')}`}
@@ -432,10 +458,12 @@
 			<div class={`hidden lg:flex flex-1 mx-4 min-w-0 ${orientation === 'vertical' ? 'lg:flex-col' : 'scroll-smooth'} relative`}>
 			<div class="flex-1 min-w-0">
 					<ul class={`flex items-center ${orientation === 'vertical' ? 'gap-2 lg:flex-col lg:items-stretch w-full' : itemsPosition === 'center' ? 'gap-4 flex-wrap justify-center w-full' : 'gap-4 flex-wrap justify-start w-full'}`}>
-						{#each visibleItemsWithActions as { label, to, href, target, rel, position, icon, className, submenu, action }}
+						{#each visibleItemsWithActions as { accountMenu, label, to, href, target, rel, position, icon, className, submenu, action }}
 							{#if orientation === 'vertical' || position !== 'right'}
 								<li class={`flex items-center flex-shrink-0 ${orientation === 'vertical' ? 'w-full justify-start' : ''}`}>
-									{#if submenu}
+									{#if accountMenu}
+										{@render accountDropdown()}
+									{:else if submenu}
 										<!-- Submenu Item -->
 										<Submenu
 											title={label ? t(label, $LL) : ''}
@@ -530,10 +558,12 @@
 				<!-- Right-positioned menu items -->
 				<div class="flex items-center {orientation === 'horizontal' ? 'mx-4' : ''}">
 					<ul class={`flex items-center ${orientation === 'vertical' ? 'gap-2 lg:flex-col lg:items-stretch w-full' : 'gap-4 flex-wrap'}`}>
-						{#each visibleItemsWithActions as { label, to, href, target, rel, position, icon, className, submenu, action }}
+						{#each visibleItemsWithActions as { accountMenu, label, to, href, target, rel, position, icon, className, submenu, action }}
 							{#if orientation !== 'vertical' && position === 'right'}
 								<li class="flex items-center flex-shrink-0">
-									{#if submenu}
+									{#if accountMenu}
+										{@render accountDropdown()}
+									{:else if submenu}
 										<!-- Submenu Item -->
 										<Submenu
 											title={label ? t(label, $LL) : ''}
@@ -624,20 +654,8 @@
 					</ul>
 				</div>
 				<div class={`flex items-center ${orientation === 'vertical' ? 'gap-2 flex-col mt-4 w-full' : 'gap-2 whitespace-nowrap'}`}>
-					{#if authEnabled && isLoggedIn}
-						<div class="relative">
-							<ActionsDropdown
-								title={userDropdownTitle}
-								formatKind={userDropdownFormatKind}
-								providerIcon={userDropdownProviderIcon}
-								open={dropdownOpen}
-								items={menuItems}
-								position="right"
-								{iconExternal}
-								{orientation}
-								onChange={handleSelect}
-							/>
-						</div>
+					{#if authEnabled && isLoggedIn && !hasAccountMenuSlot}
+						{@render accountDropdown()}
 					{/if}
 					<!-- Language Switcher -->
 					{#if (_cfg?.language as { enabled?: boolean } | undefined)?.enabled}
@@ -697,9 +715,11 @@
 				<!-- Main Menu -->
 				<div class={`transition-transform duration-300 h-full overflow-y-auto translate-x-0`}>
 					<ul class={`flex flex-col text-xl`}>
-						{#each visibleItemsWithActions as { label, to, href, target, rel, icon, className, submenu, action }}
+						{#each visibleItemsWithActions as { accountMenu, label, to, href, target, rel, icon, className, submenu, action }}
 							<li class="flex justify-center border-b border-slate-600/30">
-								{#if submenu}
+								{#if accountMenu}
+									{@render accountDropdown(true)}
+								{:else if submenu}
 									<!-- Submenu Item -->
 									<SubmenuCompact
 										title={label ? t(label, $LL) : ''}
@@ -789,22 +809,9 @@
 							</li>
 						{/each}
 
-						{#if authEnabled && isLoggedIn}
+						{#if authEnabled && isLoggedIn && !hasAccountMenuSlot}
 							<li class="flex justify-center w-full border-b border-slate-600/30">
-								<ActionsDropdown
-									title={userDropdownTitle}
-									formatKind={userDropdownFormatKind}
-									providerIcon={userDropdownProviderIcon}
-									open={dropdownOpen}
-									items={menuItems}
-									position="left"
-									isSmall={true}
-									{iconExternal}
-									theme={style}
-									onChange={handleSelect}
-									onItemSelect={closeMenu}
-									className="w-full py-8"
-								/>
+								{@render accountDropdown(true)}
 							</li>
 						{/if}
 
