@@ -239,10 +239,16 @@ declare module 'vite-plugin-config' {
 					/**
 					 * provider
 					 * @description Preferred wallet provider id. Must match detectProvider type.
-					 * @values Any string; common: `'ethereum'` | `'core'` | `'metamask'`
-					 * @recommendation `ethereum` for EVM; `core` for Core Blockchain (CorePass wallet).
+					 * @values Any string; common: `'ethereum'` | `'core'`
+					 * @recommendation `ethereum` for EVM; `core` for Core Blockchain.
 					 */
 					provider: string;
+					/** Discovery protocol; inferred from provider / RPC methods when omitted. */
+					discovery?: string;
+					/** Human-readable blockchain name used in connection errors. */
+					blockchain?: string;
+					/** HTTPS base URL including the gateway IPFS path. */
+					ipfsGateway?: string;
 					/**
 					 * autoConnect
 					 * @description Reconnect wallet on load when user previously connected on this origin.
@@ -260,7 +266,7 @@ declare module 'vite-plugin-config' {
 					accountId?: string;
 					/**
 					 * methods
-					 * @description RPC method names. Required keys: requestAccounts, chainId.
+					 * @description RPC method names. Required keys: requestAccounts, chainId. Optional accounts enables silent reconnection without requesting permission.
 					 * @values e.g. requestAccounts: `'eth_requestAccounts'`, chainId: `'eth_chainId'`
 					 * @recommendation Use eth_* for EVM; provider-specific for others.
 					 */

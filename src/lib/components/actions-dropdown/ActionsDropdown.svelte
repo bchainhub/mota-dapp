@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/env';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
 	import { LL, t } from '#lib/helpers/i18n.js';
 	import { Icon } from '#components';
 	import { asDynamicIcon } from '#lib/helpers/icon.js';
@@ -21,11 +21,11 @@
 		theme = 'blur',
 		onChange,
 		onItemSelect
-	} = $props<{
+	}: {
 		title: string | null;
 		formatKind?: ShortFormatKind;
 		providerIcon?: 'web3' | 'passkey' | null;
-		items: MenuItem[];
+		items: (MenuItem & { active?: boolean })[];
 		open?: boolean;
 		position?: 'left' | 'right';
 		isSmall?: boolean;
@@ -35,7 +35,7 @@
 		theme?: 'auto' | 'blur' | 'transparent';
 		onChange?: (event: CustomEvent<{ label: string; action?: () => void }>) => void;
 		onItemSelect?: () => void;
-	}>();
+	} = $props();
 
 	let isOpen = $state(false);
 	let slideDirection = $state<'enter' | 'exit'>('exit');
@@ -83,8 +83,11 @@
 	};
 
 	$effect(() => {
-		if (initialOpen && !isOpen) openDropdown();
-		if (!initialOpen && isOpen) closeDropdown();
+		const requestedOpen = initialOpen;
+		untrack(() => {
+			if (requestedOpen && !isOpen) openDropdown();
+			if (!requestedOpen && isOpen) closeDropdown();
+		});
 	});
 
 	$effect(() => {
@@ -97,7 +100,7 @@
 		event.preventDefault();
 		event.stopPropagation();
 		closeDropdown({ animated: true, notifyParent: true });
-		onChange?.(new CustomEvent('change', { detail: item }));
+		onChange?.(new CustomEvent('change', { detail: { ...item, label: item.label ?? '' } }));
 	};
 
 	const handleLinkClick = (event: Event) => {
@@ -136,7 +139,7 @@
 <div class="relative hidden lg:block {className}" bind:this={dropdownRef}>
 	<button
 		onclick={handleToggle}
-		class="group {orientation === 'vertical' ? 'w-full justify-start px-4 py-2' : 'px-1 py-2'} flex cursor-pointer items-center gap-1.5 text-base font-medium transition-colors duration-200 {theme === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : theme === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}"
+		class="group {orientation === 'vertical' ? 'w-full justify-start px-4 py-2' : 'px-1 py-2'} flex cursor-pointer items-center gap-1.5 text-base font-normal transition-colors duration-200 {theme === 'auto' ? 'text-white hover:text-slate-300 dark:text-slate-900 dark:hover:text-slate-600' : theme === 'transparent' ? 'text-slate-900 hover:text-slate-600 dark:text-white dark:hover:text-slate-300' : 'text-white hover:text-slate-300'}"
 		aria-expanded={isOpen}
 		aria-haspopup="true"
 	>
